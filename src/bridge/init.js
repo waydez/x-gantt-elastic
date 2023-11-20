@@ -1,0 +1,6 @@
+import './vue'
+// import './store'
+// import './router'
+// import './api'
+import './i18n'
+// import './request'

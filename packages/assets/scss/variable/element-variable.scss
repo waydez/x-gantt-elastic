@@ -1,0 +1,68 @@
+@import 'variable.scss';
+
+// 标准button高度
+$--app-button-height: $--app-base-height;
+// 标准button内边距
+$--app-button-padding: 10px 20px;
+// 禁用button背景色
+$--app-button-disabled-bgColor: $--app-notice-color;
+// 风险操作button背景色
+$--app-button-danger-bgColor: $--app-danger-color;
+// 标准button文字大小
+$--app-button-font-size: $--app-base-font-size;
+// 标准button圆角
+$--app-button-border-radius: $--app-base-border-radius;
+
+// 选择器默认宽度
+$--app-select-width: 100%;
+
+// 表格边框色
+$--app-table-border-color: #eaeef5;
+
+// form-item标准下边距
+$--app-form-item-margin-bottom: 20px;
+// form-item标准高度
+$--app-form-item-line-height: $--app-base-height;
+// form-input标准高度
+$--app-form-input-height: $--app-base-height;
+// form-input内边距
+$--app-form-input-padding: 12px;
+// form-number-input 内右边距
+$--app-form-number-input-padding-right: 42px;
+// form组件label字体大小
+$--app-form-label-font-size: $--app-base-font-size;
+// form组件label字体色
+$--app-form-label-color: $--app-base-font-color;
+
+// ---- element-ui 变量覆盖 ----
+$--color-primary: $--app-primary-color;
+
+$--color-danger: $--app-danger-color;
+
+$--size-base: $--app-font-size;
+
+$--input-height: $--app-form-input-height;
+
+$--form-label-font-size: $--app-form-label-font-size;
+
+$--button-border-radius: $--app-button-border-radius;
+
+$--button-medium-border-radius: $--app-button-border-radius;
+
+$--button-small-border-radius: $--app-button-border-radius;
+
+$--button-mini-border-radius: $--app-button-border-radius;
+
+$--button-font-size: $--app-button-font-size;
+
+$--button-disabled-background-color: $--app-button-disabled-bgColor;
+
+$--dropdown-menuItem-hover-fill: $--app-hover-color;
+
+$--menu-item-hover-fill: $--app-hover-color;
+
+$--table-current-row-background-color: $--app-hover-color;
+
+$--color-text-placeholder: $--app-notice-font-color;
+
+$--font-path: '~element-ui/lib/theme-chalk/fonts';

@@ -1,0 +1,189 @@
+<template>
+  <div class="gantt">
+    <div class="gantt-header">
+      <div>
+        <el-button v-for="item in btnList" :key="item.type" icon="mdi-plus" @click="addItem(item)">
+          {{ item.label }}
+        </el-button>
+      </div>
+      <div class="field-list">
+        <ul style="list-style: none; display: flex">
+          <template v-for="item in options.columns">
+            <div :key="item.id" style="display: flex">
+              <input v-model="item.display" type="checkbox" />
+              <li style="margin: 0 10px">
+                {{ item.label }}
+              </li>
+            </div>
+          </template>
+        </ul>
+      </div>
+    </div>
+    <div class="gantt-body">
+      <gantt-elastic
+        ref="ganttRef"
+        :options="options"
+        :tasks="tasks"
+        :dynamic-style="dynamicStyle"
+        @tasks-changed="tasksUpdate"
+        @options-changed="optionsUpdate"
+        @dynamic-style-changed="styleUpdate"
+      >
+        <template slot="header">
+          <gantt-header />
+        </template>
+        <template v-slot:uuid_planned_start="scopeSlot">
+          <div>
+            {{ scopeSlot.row.uuid_planned_start }}
+          </div>
+        </template>
+        <template slot="footer">
+          <custom-block />
+        </template>
+      </gantt-elastic>
+    </div>
+  </div>
+</template>
+
+<style></style>
+
+<script>
+import dayjs from 'dayjs'
+import GanttElastic from '@packages/components/GanttElastic.vue'
+import GanttHeader from 'gantt-elastic-header'
+import CustomBlock from './custom-block.vue'
+import { getDate, tasks, options } from './mock-task.js'
+// import { customColumns, taskMapping } from '../constant/index'
+
+export default {
+  name: 'Gantt',
+  components: {
+    GanttElastic,
+    GanttHeader,
+    CustomBlock
+  },
+  data() {
+    return {
+      scaleList: [
+        {
+          label: '年',
+          value: 'year'
+        },
+        {
+          label: '月',
+          value: 'month'
+        },
+        {
+          label: '日',
+          value: 'day'
+        }
+        // {
+        // 	label: "小时",
+        // 	value: "hour"
+        // }
+      ],
+      tasks,
+      options,
+      dynamicStyle: {},
+      lastId: 16,
+      btnList: [
+        {
+          type: 'project',
+          label: 'Add project'
+        },
+        {
+          type: 'milestone',
+          label: 'Add milestone'
+        },
+        {
+          type: 'group',
+          label: 'Add group'
+        },
+        {
+          type: 'task',
+          label: 'Add task'
+        }
+      ]
+    }
+  },
+  computed: {},
+  methods: {
+    addItem(item) {
+      const random = parseInt(Math.random() * 10)
+      const plannedStart = getDate(24 * random)
+      this.tasks.push({
+        type: item.type,
+        id: this.lastId++,
+        user: 'localhost',
+        plannedStart,
+        duration: 10 * 24 * 60 * 60 * 1000,
+        percent: 30
+      })
+    },
+    tasksUpdate() {},
+    optionsUpdate(options) {},
+    styleUpdate(style) {},
+    startClick() {
+      console.log('startClick')
+    },
+    print() {
+      // eslint-disable-next-line no-debugger
+      debugger
+      let element = document.querySelector('.gantt-elastic__main-view')
+
+      // 获取元素的大小和位置
+      var rect = element.getBoundingClientRect()
+
+      // 计算元素在画布上的位置和大小
+      var canvasWidth = 300 // 画布的宽度
+      var canvasHeight = 200 // 画布的高度
+      var scaleX = canvasWidth / rect.width
+      var scaleY = canvasHeight / rect.height
+      var scale = Math.min(scaleX, scaleY)
+      var newWidth = rect.width * scale
+      var newHeight = rect.height * scale
+      var newX = (canvasWidth - newWidth) / 2
+      var newY = (canvasHeight - newHeight) / 2
+
+      // 获取元素的HTML结构
+      var html = element.outerHTML
+
+      // 将元素绘制到画布上
+      var canvas = document.createElement('canvas')
+      canvas.width = canvasWidth
+      canvas.height = canvasHeight
+      var context = canvas.getContext('2d')
+      var image = new Image()
+      image.onload = function () {
+        context.drawImage(image, newX, newY, newWidth, newHeight)
+        var dataUrl = canvas.toDataURL('image/png')
+        var img = new Image()
+        img.src = dataUrl
+        img.onload = function () {
+          // 保存图片到文件
+          var link = document.createElement('a')
+          link.href = img.src
+          link.download = 'screenshot.png'
+          link.click()
+        }
+      }
+      image.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(html)
+    },
+    formatDate(timestamp) {
+      return dayjs(timestamp).format('YYYY-MM-DDTHH:mm:ss')
+    }
+  }
+}
+</script>
+
+<style lang="scss">
+.gantt {
+  padding: 10px;
+  .gantt-header {
+    display: flex;
+  }
+  .gantt-body {
+    width: 100%;
+  }
+}
+</style>

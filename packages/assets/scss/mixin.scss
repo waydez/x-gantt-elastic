@@ -1,0 +1,38 @@
+/**
+ * @description: 如果font-size为10的话，则使用缩放处理
+ * @param {type} 
+ * @return: 
+ */
+@mixin fontSize($fontSize) {
+  @if $fontSize == 10px {
+    font-size: 12px;
+    transform: scale(0.83);
+  } @else {
+    font-size: $fontSize;
+  }
+}
+
+/**
+ * @description: 把图形变成圆形
+ * @param {type} 
+ * @return: 
+ */
+@mixin circleShape($width) {
+  width: $width;
+  min-width: $width;
+  height: $width;
+  min-height: $width;
+  border-radius: 50%;
+}
+
+@mixin dashDotBorder($borderColor, $blankColor, $backgroundStartColor, $backgroundEndColor) {
+  border: 1px solid transparent;
+  background: linear-gradient($backgroundStartColor, $backgroundEndColor) padding-box,
+    repeating-linear-gradient(
+      -45deg,
+      $borderColor 0 10px,
+      $blankColor 10px 14px,
+      $borderColor 14px 16px,
+      $blankColor 16px 20px
+    ) border-box;
+}

@@ -1,0 +1,72 @@
+// 主题色
+$--app-primary-color: #027aff;
+$--app-danger-color: #f56c6c;
+$--app-info-color: #f5f7fa;
+$--app-notice-color: #b2b2b2;
+
+$--app-hover-color: $--app-info-color;
+$--app-blue-hover-color: #e4eefd;
+$--app-selected-color: #e6f2ff;
+$--app-active-color: #7ed321;
+$--app-light-color: #ffffff;
+$--app-opacity-color: #eeeeee;
+$--app-warning-color: #f5a623;
+// 分割线颜色
+$--app-split-line-color: #ebeef5;
+// 标准字体颜色
+$--app-base-font-color: #303133;
+// 提示性文字颜色
+$--app-notice-font-color: $--app-notice-color;
+// 白色文字颜色
+$--app-white-font-color: $--app-light-color;
+// 标准背景色
+$--app-body-bgColor: #f7f7f7;
+// form组件提示文字颜色
+$--app-form-placeholder-font-color: $--app-notice-color;
+// 标准盒子背景色
+$--app-box-bgColor: $--app-light-color;
+// 标准盒子阴影
+$--app-box-shadow: 0 0 8px 0 #dcdef8;
+// 标准盒子边框色
+$--app-box-border-color: #dcdfe6;
+$--app-base-border-radius: 4px;
+// 标准高度
+$--app-base-height: 32px;
+// 兼容safari的标准高度
+$--app-safari-line-height: 20px;
+// 标准加粗字体
+$--app-base-font-weight: bold;
+// 标准字体大小
+$--app-base-font-size: 12px;
+// 标准标题字体大小
+$--app-title-font-size: 14px;
+// 大字体大小
+$--app-large-font-size: 20px;
+// 标准菜单高度
+$--app-menu-item-height: 44px;
+// 收缩后的菜单的宽度
+$--app-menu-collapse-width: 96px;
+$--app-description-color: #929292;
+// account模块标准字体大小
+$--account-base-font-size: 14px;
+// account标题字体大小
+$--account-title-font-size: 16px;
+$--account-base-height: 36px;
+$--app-table-header-bgColor: #f2f2f2;
+$--app-light-hover-color: #ebf3fc;
+
+$--app-primary-color-light: #d6eaff;
+$--app-primary-color-hover: $--app-selected-color;
+$--app-danger-color-light: #ffd5d5;
+$--app-active-color-light: #e5fbf3;
+$--app-warning-color-light: #fff5d8;
+
+$--app-dark-box-shadow: 0 0 8px 0px #dadada;
+$--app-highlight-box-shadow: 0 0 8px 0px #027aff;
+$--app-select-tag-color: #909399;
+
+$--app-notice-border-color: #e4e7ed;
+
+$--workbench-title-color: #4a4a4a;
+
+$--app-hover-primary-color: #3595ff;

@@ -1,0 +1,5 @@
+node_modules
+lib
+npm-debug*
+package-lock.json
+src/index.scss

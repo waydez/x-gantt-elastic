@@ -1,0 +1,271 @@
+@import './variable/element-variable.scss';
+// ---- element-ui 样式覆盖 ----
+.el-button {
+  height: $--app-button-height;
+  padding: $--app-button-padding;
+  &.el-button--mini {
+    padding: 7px 15px;
+  }
+  &.el-button--default {
+    border: 1px solid $--app-primary-color;
+    color: $--app-primary-color;
+    &.is-disabled {
+      border: 1px solid $--app-notice-color;
+    }
+  }
+  &.el-button--text {
+    padding: 0;
+  }
+}
+
+.el-form-item {
+  .el-form-item__label {
+    font-size: 12px;
+    line-height: 34px;
+  }
+  .el-form-item__content {
+    font-size: 12px;
+    .el-input__inner {
+      font-size: 12px;
+    }
+    .el-radio__label {
+      font-size: 12px;
+    }
+    .el-textarea {
+      font-size: 12px;
+    }
+  }
+}
+
+.el-select,
+.el-date-editor {
+  width: $--app-select-width;
+}
+
+.el-form-item {
+  margin-bottom: $--app-form-item-margin-bottom;
+}
+
+.el-form-item__content {
+  line-height: $--app-form-item-line-height;
+}
+.el-form-item--mini {
+  .el-form-item__label,
+  .el-form-item__content {
+    line-height: 28px;
+  }
+}
+
+.el-form-item__label {
+  color: $--app-form-label-color;
+}
+
+.el-input__inner {
+  padding: $--app-form-input-padding;
+}
+
+.el-textarea {
+  .el-textarea__inner {
+    padding-left: 12px;
+    color: $--app-base-font-color;
+  }
+}
+
+.el-input-number {
+  .el-input__inner {
+    padding-right: $--app-form-number-input-padding-right;
+  }
+}
+
+.el-tree-node__content:hover {
+  background-color: $--app-info-color;
+}
+
+.tree-node {
+  height: $--app-menu-item-height;
+}
+
+.el-table {
+  border-top: 1px solid $--app-table-border-color;
+  border-left: 1px solid $--app-table-border-color;
+  border-right: 1px solid $--app-table-border-color;
+  border-radius: $--app-base-border-radius;
+  td {
+    div {
+      overflow: hidden;
+    }
+  }
+}
+
+.table-no-border {
+  .el-table {
+    border-left: 1 solid $--app-table-border-color;
+    border-right: 0;
+    border-bottom: 0;
+    border-radius: $--app-base-border-radius;
+  }
+}
+
+.el-menu-item {
+  height: $--app-menu-item-height;
+  line-height: $--app-menu-item-height;
+}
+
+.el-menu-item.is-active,
+.el-menu-item:focus {
+  background: $--app-selected-color;
+  font-weight: $--app-base-font-weight;
+}
+
+.el-selected.is-active {
+  background: $--app-selected-color;
+  font-weight: $--app-base-font-weight;
+  color: $--app-primary-color;
+}
+
+.el-tree--highlight-current .el-tree-node.is-current {
+  > .el-tree-node__content {
+    background: $--app-selected-color;
+    color: $--app-primary-color;
+    font-weight: $--app-base-font-weight;
+    > .el-tree-node__expand-icon {
+      color: $--app-primary-color;
+    }
+  }
+}
+
+.el-tag.el-tag--info {
+  background-color: $--app-info-color;
+  border: 0;
+  color: $--app-base-font-color;
+}
+
+.el-message {
+  z-index: 6000;
+  &.el-message--warning {
+    .el-icon-warning,
+    .el-message__content {
+      color: $--app-warning-color;
+    }
+  }
+}
+
+.el-tooltip__popper {
+  max-width: 652px;
+  max-height: 300px;
+}
+
+.el-menu--collapse {
+  width: $--app-menu-collapse-width;
+  .menu-item.svg-child {
+    padding-left: 16px;
+  }
+}
+
+.el-select-dropdown {
+  z-index: 5000;
+}
+
+.el-popover.el-popper {
+  z-index: 2000;
+}
+
+.el-date-picker.el-popper {
+  .el-picker-panel__body-wrapper {
+    .el-picker-panel__content {
+      text-align: center;
+    }
+  }
+}
+
+.el-select__tags {
+  .el-tag.el-tag--info {
+    color: $--app-select-tag-color;
+  }
+}
+
+.el-time-panel.el-popper {
+  z-index: 3000;
+}
+
+.el-select {
+  .el-input__inner {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.el-select.el-select--mini {
+  .el-input__suffix {
+    height: 28px;
+    top: 1px;
+  }
+}
+
+.el-select-dropdown {
+  .el-select-dropdown__empty {
+    font-size: 12px;
+    height: 12px;
+  }
+}
+
+.el-drawer__container {
+  .x-drawer-wrapper {
+    .el-drawer__header {
+      font-weight: bold;
+      color: $--app-base-font-color;
+    }
+  }
+}
+
+.el-pagination__jump .el-input__inner {
+  padding: 0 3px;
+}
+
+.el-tabs {
+  .el-tabs__header {
+    .el-tabs__item:focus.is-active.is-focus:not(:active) {
+      box-shadow: none;
+    }
+  }
+}
+
+.el-transfer-panel__filter.el-input {
+  width: auto;
+  .el-input__inner {
+    padding-right: 10px;
+    padding-left: 30px;
+  }
+}
+
+.el-popover.el-popper.env-config-popper {
+  padding: 8px 30px 8px 20px;
+  background-color: #000;
+  opacity: 0.7;
+  border: none;
+  color: $--app-white-font-color;
+  font-size: $--app-title-font-size;
+  box-shadow: $--app-box-shadow;
+  z-index: 2999;
+  pre {
+    white-space: pre-wrap;
+  }
+}
+
+// .el-drawer {
+//   position: fixed;
+// }
+
+/** css safari hack */
+@media all and (-webkit-min-device-pixel-ratio: 0) {
+  /* 这里单独设置Safari的样式 */
+  .el-input__inner {
+    line-height: $--app-safari-line-height;
+  }
+}
+
+@media all and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: 0.001dpcm) {
+  .el-input__inner {
+    line-height: $--app-base-height;
+  }
+}

@@ -1,0 +1,19 @@
+@import './variable.scss';
+.pointer {
+  cursor: pointer;
+  &:hover {
+    color: $--app-primary-color;
+  }
+}
+@mixin dashDotBorder($borderColor, $blankColor, $backgroundStartColor, $backgroundEndColor) {
+  border: 1px solid transparent;
+  background: linear-gradient($backgroundStartColor, $backgroundEndColor) padding-box,
+    repeating-linear-gradient(
+        -45deg,
+        $borderColor 0 10px,
+        $blankColor 10px 14px,
+        $borderColor 14px 16px,
+        $blankColor 16px 20px
+      )
+      border-box;
+}
