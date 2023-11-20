@@ -23,6 +23,9 @@ pnpm serve
 ```shell
 # build packages/
 pnpm lib
+
+# publish packages/
+pnpm publish --access public
 ```
 
 ## 开发

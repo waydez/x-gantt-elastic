@@ -14,7 +14,6 @@
     "cli-lib": "vue-cli-service build --target lib ./src/packages/index.js && rimraf ./dist/demo.html"
   },
   "dependencies": {
-    "@x-ui/x-dcloud-ui": "0.2.179-upgrade-sass",
     "core-js": "^3.6.5",
     "dayjs": "^1.11.10",
     "element-ui": "^2.15.9",

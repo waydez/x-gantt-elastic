@@ -13,12 +13,9 @@ import components from './vendor/package'
 import '../packages/assets/scss/index.scss'
 // 引入i18n
 import { getI18n } from '../packages/utils/vue.util'
-// 引入x-ui
-import { XLoading } from '@x-ui/x-dcloud-ui'
 import lodash from 'lodash'
 
 Vue.prototype.$lodash = lodash
-Vue.use(XLoading)
 
 components.forEach((item) => {
   Vue.component(item.name, item)
