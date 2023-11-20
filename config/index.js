@@ -13,7 +13,9 @@ module.exports = {
     'element-ui': true,
     lodash: true,
     'pinyin-pro': true,
-    mitt: true
+    mitt: true,
+    dayjs: true,
+    'resize-observer-polyfill': true
   },
   prefix: '@x-gantt-elastic'
 }

@@ -18,7 +18,7 @@ const install = (Vue, opt) => {
     return
   }
   components.forEach((item) => {
-    Vue.components(item.name, item)
+    Vue.component(item.name, item)
   })
 }
 
@@ -35,6 +35,6 @@ if (GlobalVue) {
   GlobalVue.use(GanttElasticPlugin)
 }
 
-export default { GanttElasticPlugin }
+export default GanttElasticPlugin
 
 export { GanttEngine, GanttElastic }

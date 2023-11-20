@@ -71,9 +71,11 @@ function createPlugins(config) {
       exclude,
       'process.env.NODE_ENV': JSON.stringify(env)
     }),
+    // 需要使用 entries
     alias({
       ...aliasConfig.alias,
-      resolve: aliasConfig.resolve
+      resolve: aliasConfig.resolve,
+      entries: aliasConfig.alias
     })
   ]
   if (config.min) {

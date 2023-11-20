@@ -32,7 +32,26 @@ pnpm publish --access public
 
 ### 使用
 
-1. 组件
+1. 引入
+
+```vue
+// 组件内按需引入
+<script>
+import { GanttElastic } from "@rabkit/x-gantt-elastic"
+export default {
+  components: { GanttElastic }
+}
+</script>
+
+```
+
+```js
+// main.js 中全量引入
+import GanttElasticPlugin from "@rabkit/x-gantt-elastic"
+Vue.use(GanttElasticPlugin)
+```
+
+2. 组件
 
 
 ```vue
@@ -49,7 +68,7 @@ pnpm publish --access public
 </gantt-elastic>
 ```
 
-2. 参数
+3. 参数
 
 | 字段          | 类型   | 默认值 |
 | ------------- | ------ | ------ |
@@ -64,7 +83,7 @@ pnpm publish --access public
 |               |        |        |
 | dynamic-style | Object | {}     |
 
-3. 方法
+4. 方法
 
 | 方法                  | 描述           | 返回值  |
 | --------------------- | -------------- | ------- |
@@ -72,7 +91,7 @@ pnpm publish --access public
 | options-changed       | 配置项发生改变 | options |
 | dynamic-style-changed | 样式组发生改变 | style   |
 
-4. 插槽
+5. 插槽
 
 | 插槽   | 描述           |
 | ------ | -------------- |

@@ -1,11 +1,11 @@
-const path = require('path')
+// const path = require('path')
 const { isProduct } = require('./build/utils')
 const { externalMap } = require('./config/index')
 const aliasConfig = require('./config/alias')
 
-function resolve(dir) {
-  return path.join(__dirname, dir)
-}
+// function resolve(dir) {
+//   return path.join(__dirname, dir)
+// }
 const external = {}
 
 const setAlias = (config) => {
@@ -50,10 +50,10 @@ module.exports = {
   },
   chainWebpack: (config) => {
     setAlias(config)
-    config.resolve.alias
-      .set('@', resolve('src'))
-      .set('@packages', resolve('packages'))
-      .set('@x-gantt-elastic', resolve('./'))
+    // config.resolve.alias
+    //   .set('@', resolve('src'))
+    //   .set('@packages', resolve('packages'))
+    //   .set('@x-gantt-elastic', resolve('./'))
     // use multi thread，see https://www.npmjs.com/package/thread-loader
     // config.module
     //   .rule('compile')
