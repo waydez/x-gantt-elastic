@@ -1,4 +1,4 @@
-import GanttEngine from './engine/index'
+import { GanttEngine } from './engine/index'
 import { GanttElastic } from './components/index'
 
 // import Mixin from './mixin/demo.mixin.js'
