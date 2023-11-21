@@ -1,7 +1,7 @@
 {
-  "name": "x-ui-theme-chalk",
+  "name": "x-gantt-elastic-theme-chalk",
   "version": "0.0.1",
-  "description": "Element component chalk theme.",
+  "description": "Gantt component chalk theme.",
   "main": "lib/index.css",
   "style": "lib/index.css",
   "files": [

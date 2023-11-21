@@ -22,16 +22,16 @@ module.exports = {
     'vue/attribute-hyphenation': 'off',
     'vue/html-closing-bracket-newline': 'off',
     'vue/html-self-closing': 'off',
-    // 'sort-imports': [
-    //   'error',
-    //   {
-    //     ignoreCase: true,
-    //     ignoreDeclarationSort: true,
-    //     ignoreMemberSort: true,
-    //   },
-    // ],
-    indent: [
+    'sort-imports': [
       'error',
+      {
+        ignoreCase: true,
+        ignoreDeclarationSort: true,
+        ignoreMemberSort: true,
+      },
+    ],
+    indent: [
+      'off',
       2,
       {
         VariableDeclarator: 'first',

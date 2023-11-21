@@ -5,18 +5,18 @@ const elementUIComponentPlugin = [
     'styleLibraryName': 'theme-chalk'
   }
 ]
-const XDcloudLibComponentPlugin = [
-  'component',
-  {
-    libraryName: '@x-ui/x-dcloud-ui',
-    styleLibrary: {
-      base: false,
-      name: 'theme-chalk/theme'
-    },
-    ext: '.scss'
-  },
-  '@x-ui/x-dcloud-ui'
-]
+// const XDcloudLibComponentPlugin = [
+//   'component',
+//   {
+//     libraryName: '@x-ui/x-dcloud-ui',
+//     styleLibrary: {
+//       base: false,
+//       name: 'theme-chalk/theme'
+//     },
+//     ext: '.scss'
+//   },
+//   '@x-ui/x-dcloud-ui'
+// ]
 module.exports = {
   presets: [
     [
@@ -29,7 +29,7 @@ module.exports = {
   ],
   plugins: [
     elementUIComponentPlugin,
-    XDcloudLibComponentPlugin,
+    // XDcloudLibComponentPlugin,
     '@babel/plugin-proposal-nullish-coalescing-operator',
     '@babel/plugin-proposal-optional-chaining'
   ]

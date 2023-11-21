@@ -111,7 +111,7 @@ const tasks = [
   }
 ]
 // 定义 options 中的 columns
-optiton: {
+const options = {
   taskMapping: {
     label: 'uuid_task_name'
   },
@@ -135,7 +135,7 @@ optiton: {
   :tasks="tasks"
 >
   <template v-slot:uuid_planned_start="scopeSlot">
-  	<div>
+    <div>
       {{ scopeSlot.row.uuid_planned_start }}
     </div>
   </template>

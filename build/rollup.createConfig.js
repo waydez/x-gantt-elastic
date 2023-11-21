@@ -39,7 +39,8 @@ function createPlugins(config) {
   const plugins = [
     // commonjs(),
     vue({
-      css: false
+      // Inject CSS in JavaScript. Setting css: false would extract styles in a .css file.
+      css: true
     }),
     json(),
     filesize(),
@@ -62,9 +63,11 @@ function createPlugins(config) {
     }),
     postcss({
       plugins: [simplevars(), nested(), cssnext({ warnForDuplicates: false }), cssnano()],
+      // Inject CSS into <head>, it's always false when extract: true.
       inject: false,
       // sourceMap: true,
       extensions: ['.css', '.scss', 'sass'],
+      // Extract CSS to the same location where JS file is generated but with .css extension.
       extract: true // 输出路径
     }),
     replace({

@@ -1,6 +1,6 @@
 {
   "name": "@rabkit/x-gantt-elastic",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "adyo <adyoow@qq.com>",
   "scripts": {
     "serve": "vue-cli-service serve",
