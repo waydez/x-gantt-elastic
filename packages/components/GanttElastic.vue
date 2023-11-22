@@ -1080,7 +1080,7 @@ export default {
     /**
      * Chart row click event handler
      */
-    onChartBlockRowClick(data){
+    onChartBlockRowClick(data) {
       console.log('onChartBlockRowClick', data)
       this.$emit('chart-row-click', data)
     },
