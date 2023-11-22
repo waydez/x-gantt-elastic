@@ -236,4 +236,16 @@ export default class BasicEngine {
       }
     }
   }
+
+  setTasks(tasks) {
+    this.tasks = tasks
+  }
+
+  setDynamicStyle(dynamicStyle) {
+    this.dynamicStyle = dynamicStyle
+  }
+
+  setOptions(options) {
+    this.options = options
+  }
 }

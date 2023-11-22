@@ -25,20 +25,14 @@
 import ResizeObserver from 'resize-observer-polyfill'
 import VueInstance from 'vue'
 import dayjs from 'dayjs'
-import {
-  mergeDeep,
-  mergeDeepReactive,
-  notEqualDeep,
-  getOptions,
-  prepareStyle
-} from '@packages/helpers'
+import { mergeDeep, mergeDeepReactive, notEqualDeep } from '@packages/helpers'
 import { TOGGLE_HANDLER } from '@packages/constant/index'
 import MainView from './Layout/MainView.vue'
 import ToolBar from './Layout/ToolBar.vue'
 import { GanttEngine } from '@packages/engine/index.js'
 // import { getWeekdays } from '@packages/utils/date-time.util'
-const ganttCanvas = document.createElement('canvas')
-const ctx = ganttCanvas.getContext('2d')
+const _canvas = document.createElement('canvas')
+const ctx = _canvas.getContext('2d')
 let VueInst = VueInstance
 let Vue = window.Vue
 function initVue() {
@@ -111,10 +105,13 @@ export default {
         unwatchOutputStyle: null
       },
       TOGGLE_HANDLER,
-      ganttEngine: null
+      _ganttEngine: null
     }
   },
   computed: {
+    ganttEngine() {
+      return this._ganttEngine
+    },
     /**
      * Get visible tasks
      * Very important method which will bring us only those tasks that are visible inside gantt chart
@@ -171,21 +168,24 @@ export default {
      * Style shortcut
      */
     style() {
-      return this.state.dynamicStyle
+      return (this.ganttEngine && this.ganttEngine.dynamicStyle) || {}
     },
 
     /**
      * Get columns silently
      */
     getTaskListColumnsSilently() {
-      return this.state.options.taskList.columns.filter((c) => c.display)
+      return (
+        (this.ganttEngine && this.ganttEngine.options.taskList.columns.filter((c) => c.display)) ||
+        []
+      )
     },
 
     /**
      * Get columns and compute dimensions on the fly
      */
     getTaskListColumns() {
-      this.calculateTaskListColumnsDimensions()
+      this.ganttEngine.calculateTaskListColumnsDimensions()
       return this.getTaskListColumnsSilently
     },
 
@@ -193,14 +193,14 @@ export default {
      * Tasks used for communicate with parent component
      */
     outputTasks() {
-      return this.state.tasks
+      return (this.ganttEngine && this.ganttEngine.tasks) || []
     },
 
     /**
      * Options used to communicate with parent component
      */
     outputOptions() {
-      return this.state.options
+      return (this.ganttEngine && this.ganttEngine.options) || {}
     },
 
     /**
@@ -357,215 +357,16 @@ export default {
     mergeDeepReactive,
 
     /**
-     * Calculate height of scrollbar in current browser
-     *
-     * @returns {number}
-     */
-    getScrollBarHeight() {
-      const outer = document.createElement('div')
-      outer.style.visibility = 'hidden'
-      outer.style.height = '100px'
-      outer.style.msOverflowStyle = 'scrollbar'
-      document.body.appendChild(outer)
-      var noScroll = outer.offsetHeight
-      outer.style.overflow = 'scroll'
-      var inner = document.createElement('div')
-      inner.style.height = '100%'
-      outer.appendChild(inner)
-      var withScroll = inner.offsetHeight
-      outer.parentNode.removeChild(outer)
-      const height = noScroll - withScroll
-      this.style['chart-scroll-container--vertical']['margin-left'] = `-${height}px`
-      return (this.state.options.scrollBarHeight = height)
-    },
-
-    /**
-     * Fill out empty task properties and make it reactive
-     *
-     * @param {array} tasks
-     */
-    fillTasks(tasks) {
-      for (let task of tasks) {
-        if (typeof task.plannedX === 'undefined') {
-          task.plannedX = 0
-        }
-        if (typeof task.actualX === 'undefined') {
-          task.actualX = 0
-        }
-        if (typeof task.plannedY === 'undefined') {
-          task.plannedY = 0
-        }
-        if (typeof task.actualY === 'undefined') {
-          task.actualY = 0
-        }
-        if (typeof task.plannedWidth === 'undefined') {
-          task.plannedWidth = 0
-        }
-        if (typeof task.actualWidth === 'undefined') {
-          task.plannedWidth = 0
-        }
-        if (typeof task.height === 'undefined') {
-          task.height = 0
-        }
-        if (typeof task.mouseOver === 'undefined') {
-          task.mouseOver = false
-        }
-        if (typeof task.collapsed === 'undefined') {
-          task.collapsed = false
-        }
-        if (typeof task.dependentOn === 'undefined') {
-          task.dependentOn = []
-        }
-        if (typeof task.parentId === 'undefined') {
-          task.parentId = null
-        }
-        if (typeof task.style === 'undefined') {
-          task.style = {}
-        }
-        if (typeof task.children === 'undefined') {
-          task.children = []
-        }
-        if (typeof task.allChildren === 'undefined') {
-          task.allChildren = []
-        }
-        if (typeof task.parents === 'undefined') {
-          task.parents = []
-        }
-        if (typeof task.parent === 'undefined') {
-          task.parent = null
-        }
-        // 计划
-        if (typeof task.plannedStartTime === 'undefined') {
-          task.plannedStartTime = dayjs(task.plannedStart).valueOf()
-        }
-        if (
-          typeof task.plannedEndTime === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'plannedEnd')
-        ) {
-          task.plannedEndTime = dayjs(task.plannedEnd).valueOf()
-        } else if (
-          typeof task.plannedEnd === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'plannedDuration')
-        ) {
-          task.plannedEndTime = task.plannedStartTime + task.plannedDuration
-        }
-        if (
-          typeof task.plannedDuration === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'plannedEndTime')
-        ) {
-          task.plannedDuration = task.plannedEndTime - task.plannedStartTime
-        }
-        // 实际
-        if (typeof task.actualStartTime === 'undefined') {
-          task.actualStartTime = task.actualStart && dayjs(task.actualStart).valueOf()
-        }
-        if (
-          typeof task.actualEndTime === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'actualEnd')
-        ) {
-          task.actualEndTime = task.actualEnd && dayjs(task.actualEnd).valueOf()
-        } else if (
-          typeof task.actualEnd === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'actualDuration')
-        ) {
-          task.actualEndTime = task.actualStartTime + task.actualDuration
-        }
-        if (
-          typeof task.actualDuration === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'actualEndTime')
-        ) {
-          task.actualDuration = task.actualEndTime - task.actualStartTime
-        }
-      }
-      return tasks
-    },
-
-    /**
-     * Map tasks
-     *
-     * @param {Array} tasks
-     * @param {Object} options
-     */
-    mapTasks(tasks, options) {
-      for (let [index, task] of tasks.entries()) {
-        // todo
-        tasks[index] = {
-          ...task,
-          id: task[options.taskMapping.id],
-          label: task[options.taskMapping.label],
-          // start: task[options.taskMapping.start],
-          plannedStart: task[options.taskMapping.plannedStart],
-          plannedEnd: task[options.taskMapping.plannedEnd],
-          actualStart: task[options.taskMapping.actualStart],
-          actualEnd: task[options.taskMapping.actualEnd],
-          // plannedDuration:
-          //   new Date(task[options.taskMapping.plannedEnd]).getTime() -
-          //   new Date(task[options.taskMapping.plannedStart]).getTime(),
-          progress: task[options.taskMapping.progress],
-          type: task[options.taskMapping.type],
-          style: task[options.taskMapping.style],
-          collapsed: task[options.taskMapping.collapsed]
-        }
-      }
-      return tasks
-    },
-
-    /**
-     * 识别外部 options 配置，进行整合
-     */
-    handleFormatOptions(opts) {
-      const config = { taskList: {} }
-      config.locale = opts.locale
-      config.taskMapping = opts.taskMapping
-      config.maxRows = opts.maxRows
-      config.maxHeight = opts.maxHeight
-      config.taskList.columns = opts.columns
-      return config
-    },
-
-    /**
      * Initialize component
      */
     initialize(itsUpdate = '') {
-      // style
-      if (Object.keys(this.state.dynamicStyle).length === 0) this.initializeStyle()
-      // options
-      const selfConfigOptions = this.handleFormatOptions(this.options)
-      let options = mergeDeep(
-        {},
-        this.state.options,
-        getOptions(selfConfigOptions.locale.localeName),
-        selfConfigOptions
-      )
+      const options = this.ganttEngine.initOptions(this.options)
       dayjs.locale(options.locale, null, true)
       dayjs.locale(options.locale.name)
-      if (typeof options.taskList === 'undefined') {
-        options.taskList = {}
-      }
-      options.taskList.columns = options.taskList.columns.map((column, index) => {
-        column.thresholdPercent = 100
-        column.widthFromPercentage = 0
-        column.finalWidth = 0
-        if (typeof column.height === 'undefined') {
-          column.height = 0
-        }
-        if (typeof column.style === 'undefined') {
-          column.style = {}
-        }
-        column._id = `${index}-${column.label}`
-        return column
-      })
-      this.state.options = options
+      // style
+      this.initializeStyle()
       // tasks
-      let tasks = this.mapTasks(this.tasks, options)
-      tasks = this.fillTasks(tasks)
-      this.state.tasksById = this.resetTaskTree(tasks)
-      this.state.taskTree = this.makeTaskTree(this.state.rootTask, tasks)
-      this.state.tasks = this.state.taskTree.allChildren.map((childId) => this.getTask(childId))
-      this.calculateTaskListColumnsDimensions()
-      this.state.options.scrollBarHeight = this.getScrollBarHeight()
-      this.state.options.outerHeight =
-        this.state.options.height + this.state.options.scrollBarHeight
+      this.initTasksConfig()
       this.globalOnResize()
     },
 
@@ -573,7 +374,18 @@ export default {
      * Initialize style
      */
     initializeStyle() {
-      this.state.dynamicStyle = mergeDeep({}, prepareStyle(this.dynamicStyle), this.dynamicStyle)
+      this.ganttEngine.initDynamicStyle(this.dynamicStyle)
+    },
+
+    /**
+     * Initialize tasks
+     */
+    initTasksConfig() {
+      this.ganttEngine.initTasksConfig()
+      const height = getScrollBarHeight()
+      this.options.scrollBarHeight = height
+      this.style['chart-scroll-container--vertical']['margin-left'] = `-${height}px`
+      this.options.outerHeight = this.options.height + this.options.scrollBarHeight
     },
 
     /**
@@ -625,83 +437,6 @@ export default {
           this.state.refs.chartScrollContainerVertical.scrollTop =
             this.state.refs.chartGraph.scrollTop
       }
-    },
-
-    /**
-     * Calculate task list columns dimensions
-     */
-    calculateTaskListColumnsDimensions() {
-      let final = 0
-      let percentage = 0
-      for (let column of this.state.options.taskList.columns) {
-        if (column.expander) {
-          column.widthFromPercentage =
-            ((this.getMaximalExpanderWidth() + column.width) / 100) *
-            this.state.options.taskList.percent
-        } else {
-          column.widthFromPercentage = (column.width / 100) * this.state.options.taskList.percent
-        }
-        percentage += column.widthFromPercentage
-        column.finalWidth = (column.thresholdPercent * column.widthFromPercentage) / 100
-        final += column.finalWidth
-        column.height = this.getTaskHeight() - this.style['grid-line-horizontal']['stroke-width']
-      }
-      this.state.options.taskList.widthFromPercentage = percentage
-      this.state.options.taskList.finalWidth = final
-    },
-
-    /**
-     * Reset task tree - which is used to create tree like structure inside task list
-     */
-    resetTaskTree(tasks) {
-      this.$set(this.state, 'rootTask', {
-        id: null,
-        label: 'root',
-        children: [],
-        allChildren: [],
-        parents: [],
-        parent: null,
-        __root: true
-      })
-      const tasksById = {}
-      for (let i = 0, len = tasks.length; i < len; i++) {
-        let current = tasks[i]
-        current.children = []
-        current.allChildren = []
-        current.parent = null
-        current.parents = []
-        tasksById[current.id] = current
-      }
-      return tasksById
-    },
-
-    /**
-     * Make task tree, after reset - look above
-     *
-     * @param {object} task
-     * @returns {object} tasks with children and parents
-     */
-    makeTaskTree(task, tasks) {
-      for (let i = 0, len = tasks.length; i < len; i++) {
-        let current = tasks[i]
-        if (current.parentId === task.id) {
-          if (task.parents.length) {
-            task.parents.forEach((parent) => current.parents.push(parent))
-          }
-          if (!Object.prototype.propertyIsEnumerable.call(task, '__root')) {
-            current.parents.push(task.id)
-            current.parent = task.id
-          } else {
-            current.parents = []
-            current.parent = null
-          }
-          current = this.makeTaskTree(current, tasks)
-          task.allChildren.push(current.id)
-          task.children.push(current.id)
-          current.allChildren.forEach((childId) => task.allChildren.push(childId))
-        }
-      }
-      return task
     },
 
     /**
@@ -771,63 +506,6 @@ export default {
           resolve(src.toDataURL('image/' + type))
         })
       })
-    },
-
-    /**
-     * Get gantt total height
-     *
-     * @returns {number}
-     */
-    getHeight(visibleTasks, outer = false) {
-      let height =
-        visibleTasks.length *
-          (this.state.options.row.height + this.state.options.chart.grid.horizontal.gap * 2) +
-        this.state.options.calendar.height +
-        this.state.options.calendar.strokeWidth +
-        this.state.options.calendar.gap
-      if (outer) {
-        height += this.state.options.scrollBarHeight
-      }
-      return height
-    },
-
-    /**
-     * Get one task height
-     *
-     * @returns {number}
-     */
-    getTaskHeight(withStroke = false) {
-      if (withStroke) {
-        return (
-          this.state.options.row.height +
-          this.state.options.chart.grid.horizontal.gap * 2 +
-          this.style['grid-line-horizontal']['stroke-width']
-        )
-      }
-      return this.state.options.row.height + this.state.options.chart.grid.horizontal.gap * 2
-    },
-
-    /**
-     * Get specified tasks height
-     *
-     * @returns {number}
-     */
-    getTasksHeight(visibleTasks) {
-      return visibleTasks.length * this.getTaskHeight()
-    },
-
-    /**
-     * Convert time (in milliseconds) to pixel offset inside chart
-     *
-     * @param {int} ms
-     * @returns {number}
-     */
-    timeToPixelOffsetX(ms) {
-      let x = ms - this.state.options.times.firstTime
-      if (x) {
-        x = x / this.state.options.times.timePerPixel
-      }
-      return x
     },
 
     /**
@@ -1005,8 +683,8 @@ export default {
      * Row height change event handler
      */
     onRowHeightChange(height) {
-      this.state.options.row.height = height
-      this.calculateTaskListColumnsDimensions()
+      this.options.row.height = height
+      this.ganttEngine.calculateTaskListColumnsDimensions()
       this.syncScrollTop()
     },
 
@@ -1026,8 +704,8 @@ export default {
      * Task list width change event handler
      */
     onTaskListWidthChange(value) {
-      this.state.options.taskList.percent = value
-      this.calculateTaskListColumnsDimensions()
+      this.options.taskList.percent = value
+      this.ganttEngine.calculateTaskListColumnsDimensions()
       this.fixScrollPos()
     },
 
@@ -1035,7 +713,7 @@ export default {
      * Task list column width change event handler
      */
     onTaskListColumnWidthChange() {
-      this.calculateTaskListColumnsDimensions()
+      this.ganttEngine.calculateTaskListColumnsDimensions()
       this.fixScrollPos()
     },
 
@@ -1091,8 +769,8 @@ export default {
      * init gantt engine
      */
     initEngine() {
-      this.ganttEngine = new GanttEngine()
-      return this.ganttEngine
+      this._ganttEngine = new GanttEngine()
+      return this._ganttEngine
     },
 
     /**
@@ -1114,7 +792,20 @@ export default {
         { name: 'taskList-row-click', evt: this.onTaskListRowClick },
         { name: 'chartBlock-row-click', evt: this.onChartBlockRowClick }
       ]
-      eventConfig.forEach((event) => this.$on(event.name, event.evt))
+      // this.$on('chart-scroll-horizontal', this.onScrollChart)
+      // this.$on('chart-scroll-vertical', this.onScrollChart)
+      // this.$on('chart-wheel', this.onWheelChart)
+      // this.$on('times-timeZoom-change', this.onTimeZoomChange)
+      // this.$on('row-height-change', this.onRowHeightChange)
+      // this.$on('scope-change', this.onScopeChange)
+      // this.$on('taskList-width-change', this.onTaskListWidthChange)
+      // this.$on('taskList-column-width-change', this.onTaskListColumnWidthChange)
+      // this.$on('taskList-display-toggle', this.onTaskListDisplayToggle)
+      // this.$on('chart-position-recenter', this.onChartPositionRecenter)
+      // this.$on('chart-download-with-pic', this.onChartDownloadWithPic)
+      // this.$on('taskList-row-click', this.onTaskListRowClick)
+      // this.$on('chartBlock-row-click', this.onChartBlockRowClick)
+      this.ganttEngine.initializeEvents(eventConfig, this)
     },
 
     /**
@@ -1405,7 +1096,7 @@ export default {
       this.initTimes()
       this.calculateSteps()
       this.computeCalendarWidths()
-      this.state.options.taskList.width = this.state.options.taskList.columns.reduce(
+      this.options.taskList.width = this.options.taskList.columns.reduce(
         (prev, current) => {
           return { width: prev.width + current.width }
         },
@@ -1420,27 +1111,27 @@ export default {
       if (typeof this.$el === 'undefined' || !this.$el) {
         return
       }
-      this.state.options.clientWidth = this.$el.clientWidth
+      this.options.clientWidth = this.$el.clientWidth
       if (
-        this.state.options.taskList.widthFromPercentage >
-        (this.state.options.clientWidth / 100) * this.state.options.taskList.widthThreshold
+        this.options.taskList.widthFromPercentage >
+        (this.options.clientWidth / 100) * this.options.taskList.widthThreshold
       ) {
         const diff =
-          this.state.options.taskList.widthFromPercentage -
-          (this.state.options.clientWidth / 100) * this.state.options.taskList.widthThreshold
-        let diffPercent = 100 - (diff / this.state.options.taskList.widthFromPercentage) * 100
+          this.options.taskList.widthFromPercentage -
+          (this.options.clientWidth / 100) * this.options.taskList.widthThreshold
+        let diffPercent = 100 - (diff / this.options.taskList.widthFromPercentage) * 100
         if (diffPercent < 0) {
           diffPercent = 0
         }
-        this.state.options.taskList.columns.forEach((column) => {
+        this.options.taskList.columns.forEach((column) => {
           column.thresholdPercent = diffPercent
         })
       } else {
-        this.state.options.taskList.columns.forEach((column) => {
+        this.options.taskList.columns.forEach((column) => {
           column.thresholdPercent = 100
         })
       }
-      this.calculateTaskListColumnsDimensions()
+      this.ganttEngine.calculateTaskListColumnsDimensions()
       this.$emit('calendar-recalculate')
       this.syncScrollTop()
     },
