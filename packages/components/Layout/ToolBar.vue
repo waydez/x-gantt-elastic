@@ -1,25 +1,26 @@
 <template>
   <div class="gantt-tool-bar">
     <div class="gantt-tool-bar-left">
-      <div class="gantt-only-workday">
-        <label>仅展示工作日</label>
+      <div class="gantt-tool-bar__item gantt-only-workday">
+        <label>{{ onlyWorkDay }}</label>
         <el-switch v-model="onlyDisplayWorkDay" />
       </div>
-      <div class="gantt-task-list-width">
-        <label>任务列表宽度</label>
+      <div class="gantt-tool-bar__item gantt-task-list-width">
+        <label>{{ taskListWidth }}</label>
         <el-slider v-model="taskListWidthPercent" :min="1" :max="200"></el-slider>
+      </div>
+      <div class="gantt-tool-bar__item gantt-download-pic">
+        <label>{{ exportPicture }}</label>
+        <i class="el-icon-download" @click.prevent="handleDownload"></i>
       </div>
     </div>
     <div class="gantt-tool-bar-right">
-      <div class="gantt-download-pic">
-        <i class="el-icon-download" @click.prevent="handleDownload"></i>
-      </div>
-      <div class="gantt-today">
+      <div class="gantt-tool-bar__item gantt-today">
         <el-button type="text" size="mini" round @click.prevent="recenterPosition">
-          {{ today }}
+          {{ toNow }}
         </el-button>
       </div>
-      <div class="gantt-time-dimension">
+      <div class="gantt-tool-bar__item gantt-time-dimension">
         <el-radio-group v-model="timeScale" size="mini">
           <el-radio-button v-for="item in dimension" :key="item.label" :label="item.label">
             {{ item.text }}
@@ -57,8 +58,10 @@ export default {
   inject: ['root'],
   data() {
     return {
-      downloadPicture: '下载图片',
-      today: '今天',
+      onlyWorkDay: '仅展示工作日',
+      taskListWidth: '任务列表宽度',
+      exportPicture: '导出图片',
+      toNow: '今天',
       dimension: [
         { label: 'day', text: '日' },
         { label: 'week', text: '周' },
@@ -157,10 +160,13 @@ export default {
   align-items: center;
   justify-content: space-between;
   font-size: 12px;
+  .gantt-tool-bar__item {
+    margin: 0 12px;
+  }
   &-left {
     display: flex;
     .gantt-task-list-width {
-      width: 500px;
+      // width: 500px;
       display: flex;
       // justify-content: space-between;
       align-items: center;
@@ -186,19 +192,24 @@ export default {
         margin-left: -14px;
       }
     }
+    .gantt-download-pic {
+      display: flex;
+      // justify-content: space-between;
+      align-items: center;
+      padding: 0 10px;
+      cursor: pointer;
+      & > i {
+        font-size: 16px;
+        &:hover {
+          color: #5cb6ff;
+        }
+      }
+    }
   }
   &-right {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    .gantt-download-pic {
-      font-size: 16px;
-      padding: 0 10px;
-      cursor: pointer;
-      :hover {
-        color: #5cb6ff;
-      }
-    }
     .gantt-time-dimension {
       margin-left: 10px;
     }
