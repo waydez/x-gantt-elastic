@@ -14,7 +14,11 @@ import '../packages/assets/scss/index.scss'
 // 引入i18n
 import { getI18n } from '../packages/utils/vue.util'
 import lodash from 'lodash'
+import * as html2Image from 'html-to-image'
+import htm2canvas from 'html2canvas'
 
+Vue.prototype.$html2Image = html2Image
+Vue.prototype.$htm2canvas = htm2canvas
 Vue.prototype.$lodash = lodash
 
 components.forEach((item) => {

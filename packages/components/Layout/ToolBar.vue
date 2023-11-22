@@ -1,12 +1,19 @@
 <template>
   <div class="gantt-tool-bar">
-    <div class="tool-bar-left">
-      <div class="onlyWorkDay">
+    <div class="gantt-tool-bar-left">
+      <div class="gantt-only-workday">
         <label>仅展示工作日</label>
         <el-switch v-model="onlyDisplayWorkDay" />
       </div>
+      <div class="gantt-task-list-width">
+        <label>任务列表宽度</label>
+        <el-slider v-model="taskListWidthPercent" :min="1" :max="200"></el-slider>
+      </div>
     </div>
-    <div class="tool-bar-right">
+    <div class="gantt-tool-bar-right">
+      <div class="gantt-download-pic">
+        <i class="el-icon-download" @click.prevent="handleDownload"></i>
+      </div>
       <div class="gantt-today">
         <el-button type="text" size="mini" round @click.prevent="recenterPosition">
           {{ today }}
@@ -42,6 +49,7 @@ const TIME_DIMENSION = {
     timeScale: 24 * 60 * 1000
   }
 }
+const TIME_DIMENSION_LABEL = Object.keys(TIME_DIMENSION)
 
 export default {
   name: 'GanttToolBar',
@@ -49,14 +57,16 @@ export default {
   inject: ['root'],
   data() {
     return {
+      downloadPicture: '下载图片',
       today: '今天',
       dimension: [
         { label: 'day', text: '日' },
         { label: 'week', text: '周' },
-        { label: 'month', text: '月' },
-        { label: 'year', text: '年' }
+        { label: 'month', text: '月' }
+        // { label: 'year', text: '年' }
       ],
-      onlyDisplayWorkDay: false
+      onlyDisplayWorkDay: false,
+      localPercent: 0
     }
   },
   computed: {
@@ -75,9 +85,10 @@ export default {
     // },
     timeScale: {
       get: function () {
-        const found = Object.keys(TIME_DIMENSION).find((key) => {
-          return this.options.times.timeScale === TIME_DIMENSION[key].timeScale
-        })
+        const timeScale = this.options.times.timeScale
+        const found = TIME_DIMENSION_LABEL.find(
+          (key) => timeScale === TIME_DIMENSION[key].timeScale
+        )
         return found || ''
       },
       set: function (timeScale) {
@@ -85,12 +96,27 @@ export default {
           this.setCalendarDisplay(timeScale)
           this.options.times.stepDuration = timeScale
           this.options.times.timeScale = TIME_DIMENSION[timeScale].timeScale // 365 * 30 * 24 * 60 * 1000
-          this.setZoom(TIME_DIMENSION[timeScale].timeZoom)
+          this.root.$emit('times-timeZoom-change', TIME_DIMENSION[timeScale].timeZoom)
         }
+      }
+    },
+    taskListWidthPercent: {
+      get: function () {
+        return this.localPercent
+      },
+      set: function (value) {
+        this.localPercent = Number(value)
+        this.root.$emit('taskList-width-change', Number(value))
       }
     }
   },
+  created() {
+    this.localPercent = this.root.state.options.taskList.percent
+  },
   methods: {
+    handleDownload() {
+      this.root.$emit('chart-download-with-pic')
+    },
     recenterPosition() {
       this.root.$emit('chart-position-recenter')
     },
@@ -120,9 +146,6 @@ export default {
         default:
           break
       }
-    },
-    setZoom(value) {
-      this.root.$emit('times-timeZoom-change', value)
     }
   }
 }
@@ -134,8 +157,18 @@ export default {
   align-items: center;
   justify-content: space-between;
   font-size: 12px;
-  .tool-bar-left {
-    .onlyWorkDay {
+  &-left {
+    display: flex;
+    .gantt-task-list-width {
+      width: 500px;
+      display: flex;
+      // justify-content: space-between;
+      align-items: center;
+      .el-slider {
+        width: 200px;
+      }
+    }
+    .gantt-only-workday {
       display: flex;
       align-items: center;
       .el-switch,
@@ -154,10 +187,18 @@ export default {
       }
     }
   }
-  .tool-bar-right {
+  &-right {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    .gantt-download-pic {
+      font-size: 16px;
+      padding: 0 10px;
+      cursor: pointer;
+      :hover {
+        color: #5cb6ff;
+      }
+    }
     .gantt-time-dimension {
       margin-left: 10px;
     }

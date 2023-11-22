@@ -13,7 +13,12 @@
         :style="{ ...root.style['task-list-items'], height: root.state.options.rowsHeight + 'px' }"
       >
         <!-- todo -->
-        <task-list-item v-for="task in root.visibleTasks" :key="task.documentId" :task="task">
+        <task-list-item
+          v-for="task in root.visibleTasks"
+          :key="task.documentId"
+          :task="task"
+          @click.native="taskRowClick($event, task)"
+        >
           <template v-for="column in root.getTaskListColumnsSilently">
             <template :slot="column.customSlot">
               <slot
@@ -51,6 +56,11 @@ export default {
     this.root.state.refs.taskListWrapper = this.$refs.taskListWrapper
     this.root.state.refs.taskList = this.$refs.taskList
     this.root.state.refs.taskListItems = this.$refs.taskListItems
+  },
+  methods: {
+    taskRowClick(event, task) {
+      this.root.$emit('taskList-row-click', { event, task })
+    }
   }
 }
 </script>

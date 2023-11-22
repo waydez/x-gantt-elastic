@@ -83,13 +83,18 @@ Vue.use(GanttElasticPlugin)
 |               |        |        |
 | dynamic-style | Object | {}     |
 
-4. 方法
+4. 事件
 
-| 方法                  | 描述           | 返回值  |
-| --------------------- | -------------- | ------- |
-| tasks-changed         | 任务项发生改变 | tasks   |
-| options-changed       | 配置项发生改变 | options |
-| dynamic-style-changed | 样式组发生改变 | style   |
+除了对外暴露 vue组件的生命周期外，还包括以下事件 
+
+| 方法                  | 描述               | 返回值        |
+| --------------------- | ------------------ | ------------- |
+| tasks-changed         | 任务项发生改变     | tasks         |
+| options-changed       | 配置项发生改变     | options       |
+| dynamic-style-changed | 样式组发生改变     | style         |
+| task-row-click        | 任务行点击事件     | {event, task} |
+| chart-row-click       | 图形块的行点击事件 | {event, task} |
+| calendar-recalculate  | 日期计算事件       | void          |
 
 5. 插槽
 

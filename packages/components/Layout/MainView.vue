@@ -1,11 +1,10 @@
 <template>
-  <div class="gantt-elastic__main-view" :style="{ ...root.style['main-view'] }">
+  <div ref="mainView" class="gantt-elastic__main-view" :style="{ ...root.style['main-view'] }">
     <div
       class="gantt-elastic__main-container-wrapper"
       :style="{ ...root.style['main-container-wrapper'], height: root.state.options.height + 'px' }"
     >
       <div
-        ref="mainView"
         class="gantt-elastic__main-container"
         :style="{
           ...root.style['main-container'],

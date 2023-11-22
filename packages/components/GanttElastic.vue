@@ -1,8 +1,12 @@
 <template>
   <div class="gantt-elastic" style="width: 100%">
-    <slot name="header"></slot>
-    <!-- 时间维度 -->
-    <tool-bar></tool-bar>
+    <template v-if="!!$slots.header">
+      <slot name="header"></slot>
+    </template>
+    <template v-else>
+      <!-- 时间维度 -->
+      <tool-bar></tool-bar>
+    </template>
     <main-view ref="mainView">
       <template v-for="column in getTaskListColumnsSilently" v-slot:[column.customSlot]="scopeSlot">
         <slot
@@ -33,8 +37,8 @@ import MainView from './Layout/MainView.vue'
 import ToolBar from './Layout/ToolBar.vue'
 import { GanttEngine } from '@packages/engine/index.js'
 // import { getWeekdays } from '@packages/utils/date-time.util'
-
-const ctx = document.createElement('canvas').getContext('2d')
+const ganttCanvas = document.createElement('canvas')
+const ctx = ganttCanvas.getContext('2d')
 let VueInst = VueInstance
 let Vue = window.Vue
 function initVue() {
@@ -745,8 +749,7 @@ export default {
      */
     getSVG() {
       // todo
-      return document.querySelector('.gantt-elastic__main-view')
-      // return this.state.options.mainView.outerHTML;
+      return this.state.refs.mainView
     },
 
     /**
@@ -755,17 +758,16 @@ export default {
      * @param {string} type image format
      * @returns {Promise} when resolved returns base64 image string of gantt
      */
-    getImage(type = 'image/png') {
+    getImage(type = 'png') {
       return new Promise((resolve) => {
-        const img = new Image()
-        img.onload = () => {
-          const canvas = document.createElement('canvas')
-          canvas.width = this.state.options.mainView.clientWidth
-          canvas.height = this.state.options.rowsHeight
-          canvas.getContext('2d').drawImage(img, 0, 0)
-          resolve(canvas.toDataURL(type))
-        }
-        img.src = 'data:image/svg+xml,' + encodeURIComponent(this.getSVG())
+        const mainViewDom = this.getSVG()
+        // this.$html2Image.toCanvas(mainViewDom).then((src) => {
+        //   resolve(src.toDataURL('image/' + type))
+        // })
+        // 暂时使用 htm2canvas,性能更好，用时更少
+        this.$htm2canvas(mainViewDom).then((src) => {
+          resolve(src.toDataURL('image/' + type))
+        })
       })
     },
 
@@ -1054,6 +1056,36 @@ export default {
     },
 
     /**
+     * Download chart with picture event handler
+     */
+    onChartDownloadWithPic({ name = 'timeline.jpg', type = 'jpeg' } = {}) {
+      console.time('download chart with picture')
+      this.getImage(type).then((image) => {
+        const elem = document.createElement('a')
+        elem.href = image
+        elem.download = name
+        elem.click()
+        console.timeEnd('download chart with picture')
+      })
+    },
+
+    /**
+     * TaskList Row click event handler
+     */
+    onTaskListRowClick(data) {
+      console.log('onTaskListRowClick', data)
+      this.$emit('task-row-click', data)
+    },
+
+    /**
+     * Chart row click event handler
+     */
+    onChartBlockRowClick(data){
+      console.log('onChartBlockRowClick', data)
+      this.$emit('chart-row-click', data)
+    },
+
+    /**
      * init gantt engine
      */
     initEngine() {
@@ -1075,6 +1107,9 @@ export default {
       this.$on('taskList-column-width-change', this.onTaskListColumnWidthChange)
       this.$on('taskList-display-toggle', this.onTaskListDisplayToggle)
       this.$on('chart-position-recenter', this.onChartPositionRecenter)
+      this.$on('chart-download-with-pic', this.onChartDownloadWithPic)
+      this.$on('taskList-row-click', this.onTaskListRowClick)
+      this.$on('chartBlock-row-click', this.onChartBlockRowClick)
 
       this.ganttEngine.eventBus.onInVue('chart-scroll-horizontal', this.onScrollChart, this)
     },

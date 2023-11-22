@@ -1,5 +1,7 @@
 import { GanttEngine } from './engine/index'
 import { GanttElastic } from './components/index'
+import * as html2Image from 'html-to-image'
+import htm2canvas from 'html2canvas'
 
 // import Mixin from './mixin/demo.mixin.js'
 // locale
@@ -20,6 +22,8 @@ const install = (Vue, opt) => {
   components.forEach((item) => {
     Vue.component(item.name, item)
   })
+  Vue.prototype.$html2Image = html2Image
+  Vue.prototype.$htm2canvas = htm2canvas
 }
 
 const GanttElasticPlugin = { install }

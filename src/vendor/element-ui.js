@@ -16,7 +16,8 @@ import {
   Radio,
   RadioGroup,
   RadioButton,
-  Switch
+  Switch,
+  Slider
 } from 'element-ui'
 
 Vue.use(Dropdown)
@@ -35,3 +36,4 @@ Vue.use(Radio)
 Vue.use(RadioGroup)
 Vue.use(RadioButton)
 Vue.use(Switch)
+Vue.use(Slider)
