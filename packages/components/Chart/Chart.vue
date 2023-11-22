@@ -54,6 +54,7 @@
               :task="task"
               class="gantt-elastic__chart-row-wrapper"
               :style="{ ...root.style['chart-row-wrapper'] }"
+              @click="chartRowClick($event, task)"
             >
               <component
                 :is="task.type"
@@ -143,6 +144,11 @@ export default {
     this.root.state.refs.chartGraphContainer = this.$refs.chartGraphContainer
     this.root.state.refs.chartGraph = this.$refs.chartGraph
     this.root.state.refs.chartGraphSvg = this.$refs.chartGraphSvg
+  },
+  methods: {
+    chartRowClick(event, task) {
+      this.root.$emit('chartBlock-row-click', { event, task })
+    }
   }
 }
 </script>

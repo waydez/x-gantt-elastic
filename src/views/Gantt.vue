@@ -29,9 +29,9 @@
         @options-changed="optionsUpdate"
         @dynamic-style-changed="styleUpdate"
       >
-        <template slot="header">
+        <!-- <template slot="header">
           <gantt-header />
-        </template>
+        </template> -->
         <template v-slot:uuid_planned_start="scopeSlot">
           <div>
             {{ scopeSlot.row.uuid_planned_start }}
@@ -50,7 +50,7 @@
 <script>
 import dayjs from 'dayjs'
 import GanttElastic from '@packages/components/GanttElastic.vue'
-import GanttHeader from 'gantt-elastic-header'
+// import GanttHeader from 'gantt-elastic-header'
 import CustomBlock from './custom-block.vue'
 import { getDate, tasks, options } from './mock-task.js'
 // import { customColumns, taskMapping } from '../constant/index'
@@ -59,7 +59,7 @@ export default {
   name: 'Gantt',
   components: {
     GanttElastic,
-    GanttHeader,
+    // GanttHeader,
     CustomBlock
   },
   data() {
