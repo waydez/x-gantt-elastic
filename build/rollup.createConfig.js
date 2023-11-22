@@ -134,7 +134,8 @@ async function buildEntry(config) {
     format,
     name: moduleName,
     paths: _paths,
-    exports: 'auto'
+    // Disable warning for default imports
+    exports: 'named' 
   }
   // to continue rollup after error occurred, use try-catch
   const bundle = await rollup.rollup(inputOptions)
