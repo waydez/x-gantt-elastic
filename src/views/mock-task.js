@@ -45,14 +45,14 @@ const tasks = [
   },
   {
     id: 'uuid_004',
-    uuid_planned_start: '2023-05-01',
-    uuid_planned_end: '2023-07-01',
-    uuid_actual_start: '2023-05-01',
-    uuid_actual_end: '2023-09-01',
+    uuid_planned_start: '2023-11-27',
+    uuid_planned_end: '2023-11-28',
+    // uuid_actual_start: '2023-05-01',
+    // uuid_actual_end: '2023-09-01',
     uuid_task_name: '任务为 4',
     // duration: 15 * 24 * 60 * 60 * 1000,
-    percent: 85,
-    type: 'task'
+    // percent: 85,
+    type: 'milestone'
   },
   {
     id: 'uuid_005',
@@ -80,7 +80,7 @@ const tasks = [
   {
     id: 'uuid_007',
     parentId: 'uuid_006',
-    dependentOn: ['uuid_003', 'uuid_005'],
+    dependentOn: ['uuid_003', 'uuid_006'],
     uuid_planned_start: '2023-11-22',
     uuid_planned_end: '2023-11-29',
     uuid_actual_start: '2023-11-23',

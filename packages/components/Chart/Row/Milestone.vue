@@ -53,12 +53,12 @@
       @touchmove="emitEvent('touchmove', $event)"
       @touchend="emitEvent('touchend', $event)"
     >
-      <defs>
+      <!-- <defs>
         <clipPath :id="clipPathId">
           <polygon :points="getPoints"></polygon>
         </clipPath>
-      </defs>
-      <polygon
+      </defs> -->
+      <!-- <polygon
         class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-milestone-polygon"
         :style="{
           ...root.style['chart-row-bar-polygon'],
@@ -67,7 +67,18 @@
           ...task.style['chart-row-bar-polygon']
         }"
         :points="getPoints"
-      ></polygon>
+      ></polygon> -->
+      <path
+        class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-milestone-polygon"
+        :style="{
+          ...root.style['chart-row-bar-polygon'],
+          ...root.style['chart-row-milestone-polygon'],
+          ...task.style['base'],
+          ...task.style['chart-row-bar-polygon'],
+          stroke: 0
+        }"
+        :d="getPath"
+      ></path>
       <progress-bar :task="task" :clip-path="'url(#' + clipPathId + ')'"></progress-bar>
     </svg>
     <chart-text v-if="noPrefix && root.state.options.chart.text.display" :task="task"></chart-text>
@@ -125,7 +136,20 @@ export default {
         ${task.width},${fifty}
         ${task.width - offset},${task.height}
         ${offset},${task.height}`
+    },
+    getPath() {
+      const task = this.task
+      const startX = task.width / 2
+      const fifty = task.height / 2
+      return `
+        m ${startX},0 
+        l ${fifty},${fifty}
+        l -${fifty},${fifty}
+        l -${fifty},-${fifty}
+        l ${fifty},-${fifty}
+      `
     }
   }
 }
 </script>
+<style lang="scss"></style>

@@ -87,10 +87,10 @@ export function getOptions(localeName) {
         }
       },
       progress: {
-        width: 20, //*
-        height: 6, //*
-        pattern: true,
-        bar: false
+        width: 20, // 宽度占比
+        height: 6, // 高度
+        pattern: false, // 图形占比类型
+        bar: false // 滚动条类型
       },
       text: {
         offset: 4, //*

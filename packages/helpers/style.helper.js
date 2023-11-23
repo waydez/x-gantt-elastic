@@ -208,7 +208,7 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       'stroke-width': 1
     },
     'grid-line-time': {
-      stroke: '#FF000080',
+      stroke: '#1b58e3',
       'stroke-width': 1
     },
     chart: {
@@ -287,7 +287,8 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     },
     'chart-dependency-lines-wrapper': {},
     'chart-dependency-lines-path': {
-      fill: 'transparent',
+      // 设置 none, 避免 hover 事件触发异常
+      fill: 'none',
       stroke: '#FFa00090',
       'stroke-width': 2
     },

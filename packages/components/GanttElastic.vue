@@ -1075,7 +1075,6 @@ export default {
      * TaskList Row click event handler
      */
     onTaskListRowClick(data) {
-      console.log('onTaskListRowClick', data)
       this.$emit('task-row-click', data)
     },
 
@@ -1083,7 +1082,6 @@ export default {
      * Chart row click event handler
      */
     onChartBlockRowClick(data) {
-      console.log('onChartBlockRowClick', data)
       this.$emit('chart-row-click', data)
     },
 

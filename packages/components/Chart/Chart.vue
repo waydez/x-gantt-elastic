@@ -152,3 +152,27 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+@mixin filterColor() {
+  cursor: pointer;
+  filter: hue-rotate(45deg);
+}
+
+.gantt-elastic__chart-row-bar-wrapper {
+  .gantt-elastic__chart-row-bar {
+    .gantt-elastic__chart-row-bar-polygon:hover {
+      @include filterColor;
+    }
+  }
+}
+
+.gantt-elastic__chart-dependency-lines-path:hover {
+  @include filterColor;
+}
+
+.gantt-elastic__grid-lines-wrapper .gantt-elastic__grid-lines .gantt-elastic__grid-line-time:hover {
+  @include filterColor;
+  stroke-width: 2 !important;
+}
+</style>

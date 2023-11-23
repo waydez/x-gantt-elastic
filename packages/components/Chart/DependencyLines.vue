@@ -8,17 +8,37 @@
     :style="{ ...root.style['chart-dependency-lines-container'] }"
   >
     <g v-for="task in dependencyTasks" :key="task.id">
-      <path
-        v-for="dependencyLine in task.dependencyLines"
-        :key="dependencyLine.id"
-        class="gantt-elastic__chart-dependency-lines-path"
-        :style="{
-          ...root.style['chart-dependency-lines-path'],
-          ...task.style['chart-dependency-lines-path'],
-          ...task.style['chart-dependency-lines-path-' + dependencyLine.task_id]
-        }"
-        :d="dependencyLine.points"
-      ></path>
+      <template v-for="dependencyLine in task.dependencyLines">
+        <!-- 箭头待优化 -->
+        <!-- <circle
+          :key="dependencyLine.task_id + '__prefix'"
+          :cx="getCX(dependencyLine.task_id)"
+          :cy="getCY(dependencyLine.task_id)"
+          r="3"
+          stroke="#848484"
+          fill="transparent"
+          stroke-width="1"
+        /> -->
+        <path
+          :key="dependencyLine.task_id"
+          class="gantt-elastic__chart-dependency-lines-path"
+          :style="{
+            ...root.style['chart-dependency-lines-path'],
+            ...task.style['chart-dependency-lines-path'],
+            ...task.style['chart-dependency-lines-path-' + dependencyLine.task_id]
+          }"
+          :d="dependencyLine.points"
+        ></path>
+        <!-- <circle
+          :key="dependencyLine.task_id + '__suffix'"
+          :cx="getCX(dependencyLine.to_task_id, false)"
+          :cy="getCY(dependencyLine.to_task_id)"
+          r="3"
+          stroke="#848484"
+          fill="transparent"
+          stroke-width="1"
+        /> -->
+      </template>
     </g>
   </svg>
 </template>
@@ -47,7 +67,7 @@ export default {
         .filter((task) => typeof task.dependentOn !== 'undefined')
         .map((task) => {
           task.dependencyLines = task.dependentOn.map((id) => {
-            return { points: this.getPoints(id, task.id), task_id: id }
+            return { points: this.getPoints(id, task.id), task_id: id, to_task_id: task.id }
           })
           return task
         })
@@ -88,42 +108,52 @@ export default {
         yMultiplier = -1
       }
       const offset = 10
-      const roundness = 4
+      const roundness = 16
       const isBefore = distanceX <= offset + roundness
-      let points = `M ${startX} ${startY}
+      // 简单折线
+      // let points = `M ${startX},${startY}
+      //     L ${startX + offset},${startY}
+      //     L ${(startX + stopX) / 2},${startY} ${(startX + stopX) / 2},${stopY} ${stopX},${stopY} `
+      let points = `M ${startX},${startY}
           L ${startX + offset},${startY} `
       if (isBefore) {
         points += `
-          Q ${startX + offset + roundness},${startY} ${startX + offset + roundness},${ startY + roundness * yMultiplier} 
-          L ${startX + offset + roundness}, ${ startY + (distanceY * yMultiplier) / 2 - roundness * yMultiplier }
-          Q ${startX + offset + roundness},${startY + (distanceY * yMultiplier) / 2} ${ startX + offset },${startY + (distanceY * yMultiplier) / 2}
+          Q ${startX + offset + roundness},${startY} ${startX + offset + roundness},${startY + roundness * yMultiplier}
+          L ${startX + offset + roundness},${startY + (distanceY * yMultiplier) / 2 - roundness * yMultiplier}
+          Q ${startX + offset + roundness},${startY + (distanceY * yMultiplier) / 2} ${startX + offset},${startY + (distanceY * yMultiplier) / 2}
           L ${startX - offset + distanceX},${startY + (distanceY * yMultiplier) / 2}
-          Q ${startX - offset + distanceX - roundness},${startY + (distanceY * yMultiplier) / 2} ${ startX - offset + distanceX - roundness },${startY + (distanceY * yMultiplier) / 2 + roundness * yMultiplier}
+          Q ${startX - offset + distanceX - roundness},${startY + (distanceY * yMultiplier) / 2} ${startX - offset + distanceX - roundness},${startY + (distanceY * yMultiplier) / 2 + roundness * yMultiplier}
           L ${startX - offset + distanceX - roundness},${stopY - roundness * yMultiplier}
-          Q ${startX - offset + distanceX - roundness},${stopY} ${ startX - offset + distanceX },${stopY}
+          Q ${startX - offset + distanceX - roundness},${stopY} ${startX - offset + distanceX},${stopY}
           L ${stopX},${stopY}
         `
       } else {
         points += `
           L ${startX + distanceX / 2 - roundness},${startY}
-          Q ${startX + distanceX / 2},${startY} ${startX + distanceX / 2},${ startY + roundness * yMultiplier }
+          Q ${startX + distanceX / 2},${startY} ${startX + distanceX / 2},${startY + roundness * yMultiplier}
           L ${startX + distanceX / 2},${stopY - roundness * yMultiplier}
           Q ${startX + distanceX / 2},${stopY} ${startX + distanceX / 2 + roundness},${stopY}
           L ${stopX},${stopY}
         `
       }
       return points
+    },
+
+    getCX(id, includeWidth = true) {
+      const task = this.root.getTask(id)
+      return task.plannedX + (includeWidth ? task.plannedWidth : 0)
+    },
+    getCY(id) {
+      const task = this.root.getTask(id)
+      return task.plannedY + task.height / 2
     }
   }
+  // render(h) {
+  //   console.log(h)
+  //   return h
+  // }
 }
 </script>
 
 <style lang="scss">
-.gantt-elastic__chart-dependency-lines-path {
-  &:hover {
-    stroke: red !important;
-    stroke-width: 3 !important;
-    cursor: pointer;
-  }
-}
 </style>
