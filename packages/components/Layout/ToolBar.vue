@@ -38,7 +38,7 @@ const TIME_DIMENSION = {
     timeScale: 365 * 24 * 60 * 1000
   },
   month: {
-    timeZoom: 1,
+    timeZoom: 0.5,
     timeScale: 30 * 24 * 60 * 1000
   },
   week: {
@@ -46,7 +46,7 @@ const TIME_DIMENSION = {
     timeScale: 7 * 24 * 60 * 1000
   },
   day: {
-    timeZoom: 2,
+    timeZoom: 1.5,
     timeScale: 24 * 60 * 1000
   }
 }

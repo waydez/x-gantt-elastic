@@ -28,6 +28,7 @@
         type="chart"
       ></expander>
     </foreignObject>
+    <!-- 设置里程碑的宽度，避免因为时间维度的变化而变化 -->
     <svg
       class="gantt-elastic__chart-row-bar gantt-elastic__chart-row-milestone"
       :style="{
@@ -37,7 +38,7 @@
       }"
       :x="task.x"
       :y="task.y"
-      :width="task.width"
+      :width="getSvgWidth"
       :height="task.height"
       :viewBox="`0 0 ${task.width} ${task.height}`"
       xmlns="http://www.w3.org/2000/svg"
@@ -57,8 +58,8 @@
         <clipPath :id="clipPathId">
           <polygon :points="getPoints"></polygon>
         </clipPath>
-      </defs> -->
-      <!-- <polygon
+      </defs>
+      <polygon
         class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-milestone-polygon"
         :style="{
           ...root.style['chart-row-bar-polygon'],
@@ -118,6 +119,11 @@ export default {
       return 'gantt-elastic__milestone-clip-path-' + this.task.id
     },
 
+    getSvgWidth() {
+      const { width, height } = this.task
+      return Math.max(width, height)
+    },
+
     /**
      * Get points
      *
@@ -138,15 +144,22 @@ export default {
         ${offset},${task.height}`
     },
     getPath() {
-      const task = this.task
-      const startX = task.width / 2
-      const fifty = task.height / 2
+      const { width, height } = this.task
+      const startX = width / 2
+      const cornerW = height / 3
+      const startY = height / 2 - cornerW
+      const borderRadius = 2
+      const borderW = cornerW - borderRadius * 2
       return `
-        m ${startX},0 
-        l ${fifty},${fifty}
-        l -${fifty},${fifty}
-        l -${fifty},-${fifty}
-        l ${fifty},-${fifty}
+        m ${startX + borderRadius},${startY + borderRadius}
+        l ${borderW},${borderW}
+        q ${borderRadius},${borderRadius} ${0},${borderRadius * 2}
+        l ${-borderW},${borderW}
+        q ${-borderRadius},${borderRadius} ${-borderRadius * 2},${0}
+        l ${-borderW},${-borderW}
+        q ${-borderRadius},${-borderRadius} ${0},${-borderRadius * 2}
+        l ${borderW},${-borderW}
+        q ${borderRadius},${-borderRadius} ${borderRadius * 2},${0}
       `
     }
   }

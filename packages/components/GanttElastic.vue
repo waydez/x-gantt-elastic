@@ -267,6 +267,8 @@ export default {
     this.state.unwatchOutputTasks = this.$watch(
       'outputTasks',
       (tasks) => {
+        // console.log('outputTasks changed')
+        // this.onTaskListColumnWidthChange()
         this.$emit(
           'tasks-changed',
           tasks.map((task) => task)
@@ -1026,6 +1028,7 @@ export default {
      * Task list width change event handler
      */
     onTaskListWidthChange(value) {
+      // console.log('taskList-width-change')
       this.state.options.taskList.percent = value
       this.calculateTaskListColumnsDimensions()
       this.fixScrollPos()
@@ -1035,6 +1038,7 @@ export default {
      * Task list column width change event handler
      */
     onTaskListColumnWidthChange() {
+      // console.log('taskList-column-width-change')
       this.calculateTaskListColumnsDimensions()
       this.fixScrollPos()
     },

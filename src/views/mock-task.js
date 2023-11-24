@@ -55,6 +55,17 @@ const tasks = [
     type: 'milestone'
   },
   {
+    id: 'uuid_project',
+    uuid_planned_start: '2023-11-20',
+    uuid_planned_end: '2023-11-21',
+    // uuid_actual_start: '2023-11-07',
+    // uuid_actual_end: '2023-11-11',
+    uuid_task_name: '项目计划',
+    // duration: 15 * 24 * 60 * 60 * 1000,
+    percent: 75,
+    type: 'project'
+  },
+  {
     id: 'uuid_005',
     uuid_planned_start: '2023-11-01',
     uuid_planned_end: '2023-11-06',

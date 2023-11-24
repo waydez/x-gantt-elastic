@@ -64,7 +64,7 @@ export function getOptions(localeName) {
     // todo
     times: {
       timeScale: 24 * 60 * 1000,
-      timeZoom: 2,
+      timeZoom: 1.5,
       timePerPixel: 1,
       firstTime: new Date('2022-08-01').getTime(),
       lastTime: new Date('2024-05-31').getTime(),

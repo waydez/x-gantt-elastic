@@ -107,7 +107,7 @@ export default {
         distanceY = startY - stopY
         yMultiplier = -1
       }
-      const offset = 10
+      const offset = 1
       const roundness = 16
       const isBefore = distanceX <= offset + roundness
       // 简单折线

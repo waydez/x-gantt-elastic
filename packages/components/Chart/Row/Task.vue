@@ -53,7 +53,7 @@
       @touchmove="emitEvent('touchmove', $event)"
       @touchend="emitEvent('touchend', $event)"
     >
-      <defs>
+      <!-- <defs>
         <clipPath :id="clipPathId">
           <polygon :points="getPoints"></polygon>
         </clipPath>
@@ -67,7 +67,17 @@
           ...task.style['chart-row-bar-polygon']
         }"
         :points="getPoints"
-      ></polygon>
+      ></polygon> -->
+      <path
+        class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-task-polygon"
+        :style="{
+          ...root.style['chart-row-bar-polygon'],
+          ...root.style['chart-row-task-polygon'],
+          ...task.style['base'],
+          ...task.style['chart-row-bar-polygon']
+        }"
+        :d="getPath"
+      ></path>
       <progress-bar :task="task" :clip-path="'url(#' + clipPathId + ')'"></progress-bar>
     </svg>
     <!-- todo -->
@@ -116,6 +126,23 @@ export default {
     getPoints() {
       const task = this.task
       return `0,0 ${task.width},0 ${task.width},${task.height} 0,${task.height}`
+    },
+    getPath() {
+      const { width, height } = this.task
+      const borderRadius = 4
+      // const borderRadius = this.root.state.options.chart.borderRadius
+      const borderWidth = width - borderRadius * 2
+      const borderHeight = height - borderRadius * 2
+      return `
+      m ${borderRadius},0 
+      l ${borderWidth},0 
+      q ${borderRadius},${0} ${borderRadius},${borderRadius}
+      l ${0},${borderHeight} 
+      q ${0},${borderRadius} ${-borderRadius},${borderRadius}
+      l ${-borderWidth},${0} 
+      q ${-borderRadius},${0} ${-borderRadius},${-borderRadius}
+      l ${0},${-borderHeight}
+      q ${0},${-borderRadius} ${borderRadius},${-borderRadius}`
     }
   }
 }

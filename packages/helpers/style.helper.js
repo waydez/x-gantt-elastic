@@ -258,7 +258,10 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     },
     'chart-row-project-wrapper': {},
     'chart-row-project': {},
-    'chart-row-project-polygon': {},
+    'chart-row-project-polygon': {
+      stroke: '#b1c4d5',
+      fill: '#b1c4d5'
+    },
     'chart-row-milestone-wrapper': {},
     'chart-row-milestone': {},
     'chart-row-milestone-polygon': {},

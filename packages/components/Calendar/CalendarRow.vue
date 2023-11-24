@@ -85,7 +85,6 @@ export default {
       return (child) => {
         const style = { ...basicStyle }
         if (this.which === 'month') {
-          // todo?
           style.left = this.getTextX(child) + 'px'
         }
         return style
