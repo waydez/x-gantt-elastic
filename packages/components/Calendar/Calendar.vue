@@ -103,11 +103,13 @@ export default {
       const additionalSpace = stroke + 2
       let fullWidth = this.root.state.options.width
       let formatNames = Object.keys(this.root.state.options.calendar.day.format)
+      const useFormat = this.root.state.options.calendar.day.useFormat
       for (
         let days = this.root.state.options.times.steps.length;
         days > 1;
         days = Math.ceil(days / 2)
       ) {
+        if (useFormat) return { count: days, type: useFormat }
         for (let formatName of formatNames) {
           if (
             (this.root.state.options.calendar.day.maxWidths[formatName] + additionalSpace) * days <=
@@ -144,8 +146,10 @@ export default {
         this.root.state.options.times.firstTime,
         this.root.state.options.times.lastTime
       )
+      const useFormat = this.root.state.options.calendar.day.useFormat
       // todo
       if (monthsCount === 1) {
+        if (useFormat) return { count: 1, type: useFormat }
         for (let formatName of formatNames) {
           if (
             this.root.state.options.calendar.month.maxWidths[formatName] + additionalSpace <=
@@ -159,6 +163,7 @@ export default {
         }
       }
       for (let months = monthsCount; months > 1; months = Math.ceil(months / 2)) {
+        if (useFormat) return { count: months, type: useFormat }
         for (let formatName of formatNames) {
           if (
             (this.root.state.options.calendar.month.maxWidths[formatName] + additionalSpace) *
@@ -175,7 +180,7 @@ export default {
       }
       return {
         count: 0,
-        type: formatNames[0]
+        type: useFormat || formatNames[0]
       }
     },
 

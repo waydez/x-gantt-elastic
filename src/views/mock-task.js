@@ -67,14 +67,14 @@ const tasks = [
   },
   {
     id: 'uuid_005',
-    uuid_planned_start: '2023-11-01',
-    uuid_planned_end: '2023-11-06',
-    uuid_actual_start: '2023-11-07',
-    uuid_actual_end: '2023-11-11',
+    // uuid_planned_start: '2023-11-01',
+    // uuid_planned_end: '2023-11-06',
+    // uuid_actual_start: '2023-11-07',
+    // uuid_actual_end: '2023-11-11',
     uuid_task_name: '任务为 5',
     // duration: 15 * 24 * 60 * 60 * 1000,
     percent: 75,
-    type: 'task'
+    type: 'project'
   },
   {
     id: 'uuid_006',

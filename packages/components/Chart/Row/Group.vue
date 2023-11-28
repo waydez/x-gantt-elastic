@@ -1,18 +1,18 @@
 <template>
   <g
-    class="gantt-elastic__chart-row-bar-wrapper gantt-elastic__chart-row-milestone-wrapper"
+    class="gantt-elastic__chart-row-bar-wrapper gantt-elastic__chart-row-project-wrapper"
     :style="{
       ...root.style['chart-row-bar-wrapper'],
-      ...root.style['chart-row-milestone-wrapper'],
+      ...root.style['chart-row-project-wrapper'],
       ...task.style['chart-row-bar-wrapper']
     }"
   >
     <foreignObject
       v-if="!noPrefix && displayExpander"
-      class="gantt-elastic__chart-expander gantt-elastic__chart-expander--milestone"
+      class="gantt-elastic__chart-expander gantt-elastic__chart-expander--project"
       :style="{
         ...root.style['chart-expander'],
-        ...root.style['chart-expander--milestone'],
+        ...root.style['chart-expander--project'],
         ...task.style['chart-expander']
       }"
       :x="
@@ -28,17 +28,16 @@
         type="chart"
       ></expander>
     </foreignObject>
-    <!-- 设置里程碑的宽度，避免因为时间维度的变化而变化 -->
     <svg
-      class="gantt-elastic__chart-row-bar gantt-elastic__chart-row-milestone"
+      class="gantt-elastic__chart-row-bar gantt-elastic__chart-row-project"
       :style="{
         ...root.style['chart-row-bar'],
-        ...root.style['chart-row-milestone'],
+        ...root.style['chart-row-project'],
         ...task.style['chart-row-bar']
       }"
       :x="task.x"
       :y="task.y"
-      :width="getSvgWidth"
+      :width="task.width"
       :height="task.height"
       :viewBox="`0 0 ${task.width} ${task.height}`"
       xmlns="http://www.w3.org/2000/svg"
@@ -56,27 +55,16 @@
     >
       <!-- <defs>
         <clipPath :id="clipPathId">
-          <polygon :points="getPoints"></polygon>
+          <path :d="getPoints"></path>
         </clipPath>
-      </defs>
-      <polygon
-        class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-milestone-polygon"
+      </defs> -->
+      <path
+        class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-project-polygon"
         :style="{
           ...root.style['chart-row-bar-polygon'],
-          ...root.style['chart-row-milestone-polygon'],
+          ...root.style['chart-row-project-polygon'],
           ...task.style['base'],
           ...task.style['chart-row-bar-polygon']
-        }"
-        :points="getPoints"
-      ></polygon> -->
-      <path
-        class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-milestone-polygon"
-        :style="{
-          ...root.style['chart-row-bar-polygon'],
-          ...root.style['chart-row-milestone-polygon'],
-          ...task.style['base'],
-          ...task.style['chart-row-bar-polygon'],
-          stroke: 0
         }"
         :d="getPath"
       ></path>
@@ -92,7 +80,7 @@ import ProgressBar from '../ProgressBar.vue'
 import Expander from '../../Expander.vue'
 import taskMixin from './Task.mixin.js'
 export default {
-  name: 'Milestone',
+  name: 'Group',
   components: {
     ChartText,
     ProgressBar,
@@ -116,12 +104,7 @@ export default {
      * @returns {string}
      */
     clipPathId() {
-      return 'gantt-elastic__milestone-clip-path-' + this.task.id
-    },
-
-    getSvgWidth() {
-      const { width, height } = this.task
-      return Math.max(Number(width), Number(height))
+      return 'gantt-elastic__project-clip-path-' + this.task.id
     },
 
     /**
@@ -131,38 +114,53 @@ export default {
      */
     getPoints() {
       const task = this.task
-      const fifty = task.height / 2
-      let offset = fifty
-      if (task.width / 2 - offset < 0) {
-        offset = task.width / 2
-      }
-      return `0,${fifty}
-        ${offset},0
-        ${task.width - offset},0
-        ${task.width},${fifty}
-        ${task.width - offset},${task.height}
-        ${offset},${task.height}`
+      const bottom = task.height - task.height / 4
+      const corner = task.height / 6
+      const smallCorner = task.height / 8
+      return `M ${smallCorner},0
+                L ${task.width - smallCorner} 0
+                L ${task.width} ${smallCorner}
+                L ${task.width} ${bottom}
+                L ${task.width - corner} ${task.height}
+                L ${task.width - corner * 2} ${bottom}
+                L ${corner * 2} ${bottom}
+                L ${corner} ${task.height}
+                L 0 ${bottom}
+                L 0 ${smallCorner}
+                Z
+        `
     },
+
+    /**
+     * Get path
+     */
     getPath() {
       const { width, height } = this.task
-      const startX = width / 2
-      const cornerW = height / 3
-      const startY = height / 2 - cornerW
-      const borderRadius = 2
-      const borderW = cornerW - borderRadius * 2
-      return `
-        m ${startX + borderRadius},${startY + borderRadius}
-        l ${borderW},${borderW}
-        q ${borderRadius},${borderRadius} ${0},${borderRadius * 2}
-        l ${-borderW},${borderW}
-        q ${-borderRadius},${borderRadius} ${-borderRadius * 2},${0}
-        l ${-borderW},${-borderW}
-        q ${-borderRadius},${-borderRadius} ${0},${-borderRadius * 2}
-        l ${borderW},${-borderW}
-        q ${borderRadius},${-borderRadius} ${borderRadius * 2},${0}
-      `
+      const halfHeight = height / 2
+      // 两个尖角的宽高尺寸
+      const corner = height / 4
+      return `M ${0},${halfHeight - corner}
+                l ${width},0
+                l ${0},${halfHeight}
+                l ${-corner},${-corner}
+                l ${-(width - corner * 2)},${0}
+                l ${-corner},${corner}
+                z
+        `
+    },
+
+    /**
+     * Should we display expander?
+     *
+     * @returns {boolean}
+     */
+    displayExpander() {
+      const expander = this.root.state.options.chart.expander
+      return (
+        expander.display ||
+        (expander.displayIfTaskListHidden && !this.root.state.options.taskList.display)
+      )
     }
   }
 }
 </script>
-<style lang="scss"></style>

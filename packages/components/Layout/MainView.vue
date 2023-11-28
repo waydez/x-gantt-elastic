@@ -24,8 +24,10 @@
             class="gantt-elastic__task-list-container"
             :style="{
               ...root.style['task-list-container'],
-              width: root.state.options.taskList.finalWidth + 'px',
-              height: root.state.options.height + 'px'
+              width: root.state.options.taskList.viewWidth + 'px',
+              height: root.state.options.height + 'px',
+              overflow: 'auto hidden',
+              flex: `1 0 ${root.state.options.taskList.viewWidth}px`
             }"
           >
             <task-list>
@@ -144,7 +146,7 @@ export default {
       if (!this.root.state.options.taskList.display) {
         return '0px'
       }
-      return this.root.state.options.taskList.finalWidth + 'px'
+      return this.root.state.options.taskList.viewWidth + 'px'
     },
 
     /**
@@ -203,7 +205,6 @@ export default {
    * Mounted
    */
   mounted() {
-    this.viewBoxWidth = this.$el.clientWidth
     this.root.state.refs.mainView = this.$refs.mainView
     this.root.state.refs.chartContainer = this.$refs.chartContainer
     this.root.state.refs.taskList = this.$refs.taskList

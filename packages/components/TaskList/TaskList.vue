@@ -3,7 +3,7 @@
     v-show="root.state.options.taskList.display"
     ref="taskListWrapper"
     class="gantt-elastic__task-list-wrapper"
-    :style="{ ...root.style['task-list-wrapper'], width: '100%', height: '100%' }"
+    :style="{ ...root.style['task-list-wrapper'], width: root.state.options.taskList.finalWidth + 'px', height: '100%' }"
   >
     <div ref="taskList" class="gantt-elastic__task-list" :style="{ ...root.style['task-list'] }">
       <task-list-header></task-list-header>

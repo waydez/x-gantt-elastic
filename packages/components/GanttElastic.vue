@@ -111,7 +111,8 @@ export default {
         unwatchOutputStyle: null
       },
       TOGGLE_HANDLER,
-      ganttEngine: null
+      ganttEngine: null,
+      unwatchTaskListColumnsDisplay: null
     }
   },
   computed: {
@@ -316,6 +317,13 @@ export default {
     this.$root.$emit('gantt-elastic-mounted', this)
     this.$emit('mounted', this)
     this.$root.$emit('gantt-elastic-ready', this)
+
+    this.unwatchTaskListColumnsDisplay = this.$watch(
+      'getTaskListColumnsSilently.length',
+      (val, oldVal) => {
+        if (val !== oldVal) this.calculateTaskListColumnsDimensions()
+      }
+    )
   },
 
   /**
@@ -345,6 +353,7 @@ export default {
     this.state.unwatchOutputTasks()
     this.state.unwatchOutputOptions()
     this.state.unwatchOutputStyle()
+    this.unwatchTaskListColumnsDisplay()
     this.$emit('before-destroy')
   },
 
@@ -516,11 +525,12 @@ export default {
      * 识别外部 options 配置，进行整合
      */
     handleFormatOptions(opts) {
-      const config = { taskList: {} }
+      const config = { taskList: {}, row: {} }
       config.locale = opts.locale
       config.taskMapping = opts.taskMapping
       config.maxRows = opts.maxRows
-      config.maxHeight = opts.maxHeight
+      config.row.height = opts.rowHeight
+      config.maxHeight = opts.maxHeight || opts.maxRows * opts.rowHeight
       config.taskList.columns = opts.columns
       return config
     },
@@ -635,13 +645,14 @@ export default {
     calculateTaskListColumnsDimensions() {
       let final = 0
       let percentage = 0
-      for (let column of this.state.options.taskList.columns) {
+      const { columns, percent } = this.state.options.taskList
+      for (let column of columns) {
+        if (!column.display) continue
         if (column.expander) {
           column.widthFromPercentage =
-            ((this.getMaximalExpanderWidth() + column.width) / 100) *
-            this.state.options.taskList.percent
+            ((this.getMaximalExpanderWidth() + column.width) / 100) * percent
         } else {
-          column.widthFromPercentage = (column.width / 100) * this.state.options.taskList.percent
+          column.widthFromPercentage = (column.width / 100) * percent
         }
         percentage += column.widthFromPercentage
         column.finalWidth = (column.thresholdPercent * column.widthFromPercentage) / 100
@@ -1028,10 +1039,15 @@ export default {
      * Task list width change event handler
      */
     onTaskListWidthChange(value) {
-      // console.log('taskList-width-change')
       this.state.options.taskList.percent = value
       this.calculateTaskListColumnsDimensions()
+      // this.state.options.taskList.display && this.fixScrollPos()
       this.fixScrollPos()
+    },
+
+    onTaskListViewWidthChange(value) {
+      this.state.options.taskList.viewWidth = value
+      // this.state.options.taskList.display && this.fixScrollPos()
     },
 
     /**
@@ -1109,6 +1125,7 @@ export default {
         { name: 'row-height-change', evt: this.onRowHeightChange },
         { name: 'scope-change', evt: this.onScopeChange },
         { name: 'taskList-width-change', evt: this.onTaskListWidthChange },
+        { name: 'taskList-view-width-change', evt: this.onTaskListViewWidthChange },
         { name: 'taskList-column-width-change', evt: this.onTaskListColumnWidthChange },
         { name: 'taskList-display-toggle', evt: this.onTaskListDisplayToggle },
         { name: 'chart-position-recenter', evt: this.onChartPositionRecenter },
@@ -1231,7 +1248,7 @@ export default {
      */
     computeCalendarWidths() {
       this.computeDayWidths()
-      this.computeHourWidths()
+      // this.computeHourWidths()
       this.computeMonthWidths()
     },
 
