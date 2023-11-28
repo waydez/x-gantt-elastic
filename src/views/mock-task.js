@@ -10,24 +10,6 @@ function getDate(hours) {
   return new Date(timeStamp + hours * 60 * 60 * 1000).getTime()
 }
 
-export function minDateTime(dates) {
-  if (!dates.length) return ''
-  let minIndex = 0
-  for (let i = 1; i < dates.length; i++) {
-    if (new Date(dates[i]).getTime() < new Date(dates[minIndex]).getTime()) minIndex = i
-  }
-  return dates[minIndex]
-}
-
-export function maxDateTime(dates) {
-  if (!dates.length) return ''
-  let maxIndex = 0
-  for (let i = 1; i < dates.length; i++) {
-    if (new Date(dates[i]).getTime() > new Date(dates[maxIndex]).getTime()) maxIndex = i
-  }
-  return dates[maxIndex]
-}
-
 const tasks = [
   {
     id: 'uuid_001',

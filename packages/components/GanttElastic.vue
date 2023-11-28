@@ -36,7 +36,7 @@ import { TOGGLE_HANDLER } from '@packages/constant/index'
 import MainView from './Layout/MainView.vue'
 import ToolBar from './Layout/ToolBar.vue'
 import { GanttEngine } from '@packages/engine/index.js'
-// import { getWeekdays } from '@packages/utils/date-time.util'
+import { minDateTime, maxDateTime } from '@packages/utils/datetime.util'
 const ganttCanvas = document.createElement('canvas')
 const ctx = ganttCanvas.getContext('2d')
 let VueInst = VueInstance
@@ -1041,13 +1041,11 @@ export default {
     onTaskListWidthChange(value) {
       this.state.options.taskList.percent = value
       this.calculateTaskListColumnsDimensions()
-      // this.state.options.taskList.display && this.fixScrollPos()
-      this.fixScrollPos()
+      this.state.options.taskList.display && this.fixScrollPos()
     },
 
     onTaskListViewWidthChange(value) {
       this.state.options.taskList.viewWidth = value
-      // this.state.options.taskList.display && this.fixScrollPos()
     },
 
     /**
@@ -1472,6 +1470,38 @@ export default {
         const found = this.state.tasks.find((v) => v.id === t.id)
         if (found) found.collapsed = collapsed
       })
+    },
+    /**
+     * 根据条件分组
+     */
+    handleFilterGroup(condition, tasks) {
+      if (!condition) return
+      const map = new Map()
+      tasks.forEach((item) => {
+        const key = item[condition]
+        if (!map.has(key)) map.set(key, [])
+        map.get(key).push(item)
+      })
+      const newTasks = []
+      const idProp = this.state.options.taskMapping.id
+      const labelProp = this.state.options.taskMapping.label
+      const startProp = this.state.options.taskMapping.plannedStart
+      const endProp = this.state.options.taskMapping.plannedEnd
+      for (const [key, value] of map.entries()) {
+        const min = minDateTime(value.map((v) => v[startProp]))
+        const max = maxDateTime(value.map((v) => v[endProp]))
+        newTasks.push({
+          [idProp]: 'uuid_group_' + key,
+          [labelProp]: key,
+          [startProp]: min,
+          [endProp]: max,
+          type: 'group',
+          condition
+        })
+        value.forEach((v) => (v.parentId = 'uuid_group_' + key))
+        newTasks.push(...value)
+      }
+      return newTasks
     }
   }
 }
