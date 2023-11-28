@@ -46,9 +46,10 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     'calendar-row-rect--hour': {},
     'calendar-row-rect-child': {
       display: 'block',
-      'border-right-width': '1px', // Calendar
-      'border-right-color': '#dadada',
-      'border-right-style': 'solid',
+      // 日期分割线条
+      // 'border-right-width': '1px', // Calendar
+      // 'border-right-color': '#dadada',
+      // 'border-right-style': 'solid',
       position: 'relative',
       // 避免字段收到了全局样式影响
       'text-align': 'left'
@@ -128,7 +129,10 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       fill: '#ffffffa0',
       stroke: '#000000A0'
     },
-    'task-list-container': {},
+    'task-list-container': {
+      'box-shadow': '#c6c6c6 0px 1px 5px',
+      'z-index': 1
+    },
     'task-list-header-label': {
       overflow: 'hidden',
       'text-overflow': 'ellipsis',
@@ -158,6 +162,7 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     'task-list-items': {
       overflow: 'hidden'
     },
+    // 任务内容的表格线条
     'task-list-item': {
       'border-top': '1px solid #eee',
       'border-right': '1px solid #eee',
@@ -199,12 +204,13 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       background: '#FFFFFF'
     },
     'grid-lines': {},
+    // todo 图表的线条样式
     'grid-line-horizontal': {
-      stroke: '#00000010',
+      stroke: '#eee',
       'stroke-width': 1
     },
     'grid-line-vertical': {
-      stroke: '#00000010',
+      stroke: '#eee',
       'stroke-width': 1
     },
     'grid-line-time': {

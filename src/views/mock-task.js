@@ -9,6 +9,25 @@ function getDate(hours) {
   const timeStamp = new Date(currentYear, currentMonth, currentDay, 0, 0, 0).getTime()
   return new Date(timeStamp + hours * 60 * 60 * 1000).getTime()
 }
+
+export function minDateTime(dates) {
+  if (!dates.length) return ''
+  let minIndex = 0
+  for (let i = 1; i < dates.length; i++) {
+    if (new Date(dates[i]).getTime() < new Date(dates[minIndex]).getTime()) minIndex = i
+  }
+  return dates[minIndex]
+}
+
+export function maxDateTime(dates) {
+  if (!dates.length) return ''
+  let maxIndex = 0
+  for (let i = 1; i < dates.length; i++) {
+    if (new Date(dates[i]).getTime() > new Date(dates[maxIndex]).getTime()) maxIndex = i
+  }
+  return dates[maxIndex]
+}
+
 const tasks = [
   {
     id: 'uuid_001',
@@ -53,63 +72,41 @@ const tasks = [
     // duration: 15 * 24 * 60 * 60 * 1000,
     // percent: 85,
     type: 'milestone'
-  },
-  {
-    id: 'uuid_project',
-    uuid_planned_start: '2023-11-20',
-    uuid_planned_end: '2023-11-21',
-    // uuid_actual_start: '2023-11-07',
-    // uuid_actual_end: '2023-11-11',
-    uuid_task_name: '项目计划',
-    // duration: 15 * 24 * 60 * 60 * 1000,
-    percent: 75,
-    type: 'project'
+    // type: 'task'
   },
   {
     id: 'uuid_005',
-    // uuid_planned_start: '2023-11-01',
-    // uuid_planned_end: '2023-11-06',
-    // uuid_actual_start: '2023-11-07',
-    // uuid_actual_end: '2023-11-11',
-    uuid_task_name: '任务为 5',
-    // duration: 15 * 24 * 60 * 60 * 1000,
-    percent: 75,
-    type: 'project'
-  },
-  {
-    id: 'uuid_006',
     uuid_planned_start: '2023-11-20',
     uuid_planned_end: '2023-11-27',
     uuid_actual_start: '2023-11-21',
     uuid_actual_end: '2023-11-28',
-    uuid_task_name: '任务为 6',
+    uuid_task_name: '任务为 5',
     // duration: 15 * 24 * 60 * 60 * 1000,
     percent: 65,
-    type: 'task',
-    parentId: 'uuid_005'
+    type: 'task'
   },
   {
-    id: 'uuid_007',
-    parentId: 'uuid_006',
-    dependentOn: ['uuid_003', 'uuid_006'],
+    id: 'uuid_006',
+    // parentId: 'uuid_006',
+    // dependentOn: ['uuid_003', 'uuid_006'],
     uuid_planned_start: '2023-11-22',
     uuid_planned_end: '2023-11-29',
     uuid_actual_start: '2023-11-23',
     uuid_actual_end: '2023-11-30',
-    uuid_task_name: '任务为 7',
+    uuid_task_name: '任务为 6',
     // duration: 15 * 24 * 60 * 60 * 1000,
     percent: 35,
     type: 'task'
   },
   {
-    id: 'uuid_008',
-    parentId: 'uuid_007',
-    dependentOn: ['uuid_001', 'uuid_006'],
+    id: 'uuid_007',
+    // parentId: 'uuid_007',
+    // dependentOn: ['uuid_001', 'uuid_006'],
     uuid_planned_start: '2023-12-02 ',
     uuid_planned_end: '2023-12-05 ',
     uuid_actual_start: '2023-12-01',
     uuid_actual_end: '2023-12-04',
-    uuid_task_name: '任务为 8',
+    uuid_task_name: '任务为 7',
     // duration: 15 * 24 * 60 * 60 * 1000,
     percent: 15,
     type: 'task'
@@ -126,8 +123,10 @@ const options = {
     actualStart: 'uuid_actual_start',
     actualEnd: 'uuid_actual_end'
   },
-  maxRows: 100,
-  maxHeight: 900,
+  // 若 maxHeight 为 0 或者 undefined，则使用 maxRows 和 rowHeight 计算最大高度
+  maxHeight: 0,
+  maxRows: 20,
+  rowHeight: 36,
   columns: [
     {
       id: 'uuid_task_name',
