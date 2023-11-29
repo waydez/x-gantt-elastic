@@ -25,6 +25,7 @@
 import ResizeObserver from 'resize-observer-polyfill'
 import VueInstance from 'vue'
 import dayjs from 'dayjs'
+import { cloneDeep } from 'lodash-es'
 import {
   mergeDeep,
   mergeDeepReactive,
@@ -863,11 +864,10 @@ export default {
      * @returns {boolean}
      */
     isInsideViewPort(x, width, buffer = 5000) {
+      const { left, right } = this.state.options.scroll.chart
       return (
-        (x + width + buffer >= this.state.options.scroll.chart.left &&
-          x - buffer <= this.state.options.scroll.chart.right) ||
-        (x - buffer <= this.state.options.scroll.chart.left &&
-          x + width + buffer >= this.state.options.scroll.chart.right)
+        (x + width + buffer >= left && x - buffer <= right) ||
+        (x - buffer <= left && x + width + buffer >= right)
       )
     },
 
@@ -881,6 +881,16 @@ export default {
         this.state.refs.chartScrollContainerHorizontal.scrollLeft,
         this.state.refs.chartScrollContainerVertical.scrollTop
       )
+    },
+
+    /**
+     * 刷新滚动
+     */
+    refreshScrollChart() {
+      const { left, top } = this.state.options.scroll.chart
+
+      this._onScrollChart(0, 0)
+      this.scrollTo(left, top)
     },
 
     /**
@@ -1417,6 +1427,7 @@ export default {
      * Setup and calculate everything
      */
     setup(itsUpdate = '') {
+      itsUpdate && this.refreshScrollChart()
       this.initialize(itsUpdate)
       this.prepareDates()
       this.initTimes()
@@ -1476,8 +1487,9 @@ export default {
      */
     handleFilterGroup(condition, tasks) {
       if (!condition) return
+      const cloneTasks = cloneDeep(tasks)
       const map = new Map()
-      tasks.forEach((item) => {
+      cloneTasks.forEach((item) => {
         const key = item[condition]
         if (!map.has(key)) map.set(key, [])
         map.get(key).push(item)

@@ -22,7 +22,7 @@
         <el-button icon="mdi-plus" @click="doGroupFilter">
           {{ doGroup }}
         </el-button>
-        <el-select v-model="groupCondition">
+        <el-select v-model="groupCondition" multiple>
           <el-option
             v-for="item in options.columns"
             :key="item.id"
@@ -123,7 +123,7 @@ export default {
           label: 'Add task'
         }
       ],
-      groupCondition: '',
+      groupCondition: [],
       proxyTasks: tasks,
       doGroup: '进行分组'
     }
@@ -196,8 +196,13 @@ export default {
     },
     doGroupFilter() {
       const condition = this.groupCondition
-      if (!condition) return
-      this.proxyTasks = this.$refs.ganttRef.handleFilterGroup(condition, this.tasks)
+      let tasks = []
+      if (!condition || !condition.length) {
+        tasks = this.tasks
+      } else {
+        tasks = this.$refs.ganttRef.handleFilterGroup(condition[0], this.tasks)
+      }
+      this.proxyTasks = tasks
     }
   }
 }
