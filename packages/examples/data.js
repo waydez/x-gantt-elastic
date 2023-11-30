@@ -28,11 +28,11 @@ const template = {
   uuid_task_name: '任务为 xxxxxxxx'
 }
 const businessData = []
-for (let i = 0 ; i < 30; i++) {
+for (let i = 0; i < 30; i++) {
   businessData.push(template)
 }
 // console.log(businessData)
 module.exports = {
   colsConfig,
-	businessData
+  businessData
 }

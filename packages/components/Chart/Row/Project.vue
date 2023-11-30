@@ -53,11 +53,11 @@
       @touchmove="emitEvent('touchmove', $event)"
       @touchend="emitEvent('touchend', $event)"
     >
-      <defs>
+      <!-- <defs>
         <clipPath :id="clipPathId">
           <path :d="getPoints"></path>
         </clipPath>
-      </defs>
+      </defs> -->
       <path
         class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-project-polygon"
         :style="{
@@ -66,7 +66,7 @@
           ...task.style['base'],
           ...task.style['chart-row-bar-polygon']
         }"
-        :d="getPoints"
+        :d="getPath"
       ></path>
       <progress-bar :task="task" :clip-path="'url(#' + clipPathId + ')'"></progress-bar>
     </svg>
@@ -128,6 +128,24 @@ export default {
                 L 0 ${bottom}
                 L 0 ${smallCorner}
                 Z
+        `
+    },
+
+    /**
+     * Get path
+     */
+    getPath() {
+      const { width, height } = this.task
+      const halfHeight = height / 2
+      // 两个尖角的宽高尺寸
+      const corner = height / 4
+      return `M ${0},${halfHeight - corner}
+                l ${width},0
+                l ${0},${halfHeight}
+                l ${-corner},${-corner}
+                l ${-(width - corner * 2)},${0}
+                l ${-corner},${corner}
+                z
         `
     },
 

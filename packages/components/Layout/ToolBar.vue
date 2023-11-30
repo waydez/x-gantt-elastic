@@ -7,7 +7,11 @@
       </div>
       <div class="gantt-tool-bar__item gantt-task-list-width">
         <label>{{ taskListWidth }}</label>
-        <el-slider v-model="taskListWidthPercent" :min="1" :max="200"></el-slider>
+        <el-slider
+          v-model="taskListWidthPercent"
+          :min="200"
+          :max="root.state.options.taskList.finalWidth"
+        ></el-slider>
       </div>
       <div class="gantt-tool-bar__item gantt-download-pic">
         <label>{{ exportPicture }}</label>
@@ -38,7 +42,7 @@ const TIME_DIMENSION = {
     timeScale: 365 * 24 * 60 * 1000
   },
   month: {
-    timeZoom: 1,
+    timeZoom: 0.5,
     timeScale: 30 * 24 * 60 * 1000
   },
   week: {
@@ -46,7 +50,7 @@ const TIME_DIMENSION = {
     timeScale: 7 * 24 * 60 * 1000
   },
   day: {
-    timeZoom: 2,
+    timeZoom: 1.5,
     timeScale: 24 * 60 * 1000
   }
 }
@@ -69,7 +73,7 @@ export default {
         // { label: 'year', text: '年' }
       ],
       onlyDisplayWorkDay: false,
-      localPercent: 0
+      viewWidth: 0
     }
   },
   computed: {
@@ -105,16 +109,16 @@ export default {
     },
     taskListWidthPercent: {
       get: function () {
-        return this.localPercent
+        return this.viewWidth
       },
       set: function (value) {
-        this.localPercent = Number(value)
-        this.root.$emit('taskList-width-change', Number(value))
+        this.viewWidth = Number(value)
+        this.root.$emit('taskList-view-width-change', Number(value))
       }
     }
   },
   created() {
-    this.localPercent = this.root.state.options.taskList.percent
+    this.viewWidth = this.root.state.options.taskList.viewWidth
   },
   methods: {
     handleDownload() {

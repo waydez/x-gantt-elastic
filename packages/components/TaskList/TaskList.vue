@@ -3,7 +3,11 @@
     v-show="root.state.options.taskList.display"
     ref="taskListWrapper"
     class="gantt-elastic__task-list-wrapper"
-    :style="{ ...root.style['task-list-wrapper'], width: '100%', height: '100%' }"
+    :style="{
+      ...root.style['task-list-wrapper'],
+      width: root.state.options.taskList.finalWidth + 'px',
+      height: '100%'
+    }"
   >
     <div ref="taskList" class="gantt-elastic__task-list" :style="{ ...root.style['task-list'] }">
       <task-list-header></task-list-header>
@@ -19,7 +23,7 @@
           :task="task"
           @click.native="taskRowClick($event, task)"
         >
-          <template v-for="column in root.getTaskListColumnsSilently">
+          <template v-for="column in root.getTaskListAllColumns">
             <template :slot="column.customSlot">
               <slot
                 v-if="column.customSlot"
@@ -53,9 +57,15 @@ export default {
    * Mounted
    */
   mounted() {
-    this.root.state.refs.taskListWrapper = this.$refs.taskListWrapper
-    this.root.state.refs.taskList = this.$refs.taskList
-    this.root.state.refs.taskListItems = this.$refs.taskListItems
+    // this.root.state.refs.taskListWrapper = this.$refs.taskListWrapper
+    // this.root.state.refs.taskList = this.$refs.taskList
+    if (!this.root.state.refs.taskListWrapper) this.root.state.refs.taskListWrapper = []
+    if (!this.root.state.refs.taskList) this.root.state.refs.taskList = []
+    if (!this.root.state.refs.taskListItems) this.root.state.refs.taskListItems = []
+
+    this.root.state.refs.taskListWrapper.push(this.$refs.taskListWrapper)
+    this.root.state.refs.taskList.push(this.$refs.taskList)
+    this.root.state.refs.taskListItems.push(this.$refs.taskListItems)
   },
   methods: {
     taskRowClick(event, task) {

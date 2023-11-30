@@ -7,11 +7,11 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    redirect: 'workbench'
+    redirect: 'workspace'
   },
   {
-    path: '/workbench',
-    name: 'workbench',
+    path: '/workspace',
+    name: 'workspace',
     component: () => import('../views/Gantt.vue')
   }
 ]

@@ -63,7 +63,7 @@
                   x: task.plannedX,
                   y: task.plannedY,
                   width: task.plannedWidth,
-                  height: task.height / (1 + ((task.actualStartTime && 1) || 0)),
+                  height: task.height / (1 + hasPeerLine(task)),
                   id: task.id,
                   allChildren: task.allChildren,
                   label: task.label,
@@ -72,7 +72,7 @@
                 }"
               ></component>
               <!-- 如果没有实际进度，则全显示计划进度  -->
-              <template v-if="task.actualStartTime">
+              <template v-if="hasPeerLine(task)">
                 <!-- 实际进度不显示展开收起 -->
                 <component
                   :is="task.type"
@@ -107,6 +107,8 @@ import DependencyLines from './DependencyLines.vue'
 import Task from './Row/Task.vue'
 import Milestone from './Row/Milestone.vue'
 import Project from './Row/Project.vue'
+import Group from './Row/Group.vue'
+
 export default {
   name: 'Chart',
   components: {
@@ -116,6 +118,7 @@ export default {
     Task,
     Milestone,
     Project,
+    Group,
     DaysHighlight
   },
   inject: ['root'],
@@ -148,7 +151,34 @@ export default {
   methods: {
     chartRowClick(event, task) {
       this.root.$emit('chartBlock-row-click', { event, task })
+    },
+    hasPeerLine(task) {
+      return task.type === 'task' && !!task.actualStartTime && !!task.actualEndTime
     }
   }
 }
 </script>
+
+<style lang="scss">
+@mixin filterColor() {
+  cursor: pointer;
+  filter: hue-rotate(45deg);
+}
+
+.gantt-elastic__chart-row-bar-wrapper {
+  .gantt-elastic__chart-row-bar {
+    .gantt-elastic__chart-row-bar-polygon:hover {
+      @include filterColor;
+    }
+  }
+}
+
+.gantt-elastic__chart-dependency-lines-path:hover {
+  @include filterColor;
+}
+
+.gantt-elastic__grid-lines-wrapper .gantt-elastic__grid-lines .gantt-elastic__grid-line-time:hover {
+  @include filterColor;
+  stroke-width: 2 !important;
+}
+</style>

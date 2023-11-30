@@ -64,7 +64,7 @@ export function getOptions(localeName) {
     // todo
     times: {
       timeScale: 24 * 60 * 1000,
-      timeZoom: 2,
+      timeZoom: 1.5,
       timePerPixel: 1,
       firstTime: new Date('2022-08-01').getTime(),
       lastTime: new Date('2024-05-31').getTime(),
@@ -76,7 +76,8 @@ export function getOptions(localeName) {
       steps: []
     },
     row: {
-      height: 36 //*
+      // 甘特图中图形的单行高度
+      height: 36
     },
     maxRows: 20, //*
     maxHeight: 0, //*
@@ -87,10 +88,10 @@ export function getOptions(localeName) {
         }
       },
       progress: {
-        width: 20, //*
-        height: 6, //*
-        pattern: true,
-        bar: false
+        width: 20, // 宽度占比
+        height: 6, // 高度
+        pattern: false, // 图形占比类型
+        bar: false // 滚动条类型
       },
       text: {
         offset: 4, //*
@@ -103,6 +104,10 @@ export function getOptions(localeName) {
         displayIfTaskListHidden: true, //*
         offset: 4, //*
         size: 18
+      },
+      line: {
+        horizontal: false,
+        vertical: true
       }
     },
     taskList: {
@@ -122,7 +127,8 @@ export function getOptions(localeName) {
       width: 0,
       finalWidth: 0,
       widthFromPercentage: 0,
-      minWidth: 18,
+      minWidth: 180,
+      viewWidth: 400,
       expander: {
         type: 'task-list',
         size: 16,
@@ -135,7 +141,7 @@ export function getOptions(localeName) {
     calendar: {
       // onlyDisplayWorkDay: false,
       workingDays: [1, 2, 3, 4, 5], // 工作日 [1, 2, 3, 4, 5, 6, 0]
-      gap: 6, //*
+      gap: 0, // 日期 和 甘特图下方 的间距
       height: 0,
       strokeWidth: 1,
       hour: {
@@ -166,6 +172,9 @@ export function getOptions(localeName) {
         display: true, //*
         widths: [],
         maxWidths: { short: 0, medium: 0, long: 0 },
+        // 默认自适应，设置后使用对应格式
+        // 配置为简洁版内容
+        useFormat: 'short',
         format: {
           long(date) {
             return date.format('DD dddd')
@@ -183,6 +192,9 @@ export function getOptions(localeName) {
         display: true, //*
         widths: [],
         maxWidths: { short: 0, medium: 0, long: 0 },
+        // 默认自适应，设置后使用对应格式
+        // 配置为简洁版内容
+        useFormat: 'short',
         format: {
           //*
           short(date) {

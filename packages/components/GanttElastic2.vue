@@ -761,7 +761,6 @@ export default {
      * Chart row click event handler
      */
     onChartBlockRowClick(data) {
-      console.log('onChartBlockRowClick', data)
       this.$emit('chart-row-click', data)
     },
 
@@ -792,19 +791,6 @@ export default {
         { name: 'taskList-row-click', evt: this.onTaskListRowClick },
         { name: 'chartBlock-row-click', evt: this.onChartBlockRowClick }
       ]
-      // this.$on('chart-scroll-horizontal', this.onScrollChart)
-      // this.$on('chart-scroll-vertical', this.onScrollChart)
-      // this.$on('chart-wheel', this.onWheelChart)
-      // this.$on('times-timeZoom-change', this.onTimeZoomChange)
-      // this.$on('row-height-change', this.onRowHeightChange)
-      // this.$on('scope-change', this.onScopeChange)
-      // this.$on('taskList-width-change', this.onTaskListWidthChange)
-      // this.$on('taskList-column-width-change', this.onTaskListColumnWidthChange)
-      // this.$on('taskList-display-toggle', this.onTaskListDisplayToggle)
-      // this.$on('chart-position-recenter', this.onChartPositionRecenter)
-      // this.$on('chart-download-with-pic', this.onChartDownloadWithPic)
-      // this.$on('taskList-row-click', this.onTaskListRowClick)
-      // this.$on('chartBlock-row-click', this.onChartBlockRowClick)
       this.ganttEngine.initializeEvents(eventConfig, this)
     },
 

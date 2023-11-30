@@ -10,6 +10,7 @@
     xmlns="http://www.w3.org/2000/svg"
   >
     <g class="gantt-elastic__grid-lines" :style="{ ...root.style['grid-lines'] }">
+      <!-- todo 分组 -->
       <line
         v-for="line in horizontalLines"
         :key="line.key"
@@ -148,12 +149,4 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.gantt-elastic__grid-lines-wrapper {
-  .gantt-elastic__grid-lines .gantt-elastic__grid-line-time:hover {
-    stroke: #1b58e3 !important;
-    stroke-width: 2 !important;
-    cursor: pointer;
-  }
-}
-</style>
+<style lang="scss"></style>

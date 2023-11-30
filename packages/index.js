@@ -12,9 +12,11 @@ import htm2canvas from 'html2canvas'
 // import './vendor/element-ui'
 // import EventBus from './vendor/event-bus'
 
+GanttElastic.install = (Vue, opts) => Vue.component(GanttElastic.name, GanttElastic)
+
 const components = [GanttElastic]
 
-const install = (Vue, opt) => {
+const install = (Vue, opts) => {
   // check if installed
   if (install.installed) {
     return

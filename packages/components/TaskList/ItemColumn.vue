@@ -3,44 +3,33 @@
     <div class="gantt-elastic__task-list-item-value-wrapper" :style="wrapperStyle">
       <slot></slot>
       <div class="gantt-elastic__task-list-item-value-container" :style="containerStyle">
-        <slot v-if="column.customSlot" :name="column.customSlot" />
-        <template v-else>
-          <div
-            v-if="!html"
-            class="gantt-elastic__task-list-item-value"
-            :style="valueStyle"
-            @click="emitEvent('click', $event)"
-            @mouseenter="emitEvent('mouseenter', $event)"
-            @mouseover="emitEvent('mouseover', $event)"
-            @mouseout="emitEvent('mouseout', $event)"
-            @mousemove="emitEvent('mousemove', $event)"
-            @mousedown="emitEvent('mousedown', $event)"
-            @mouseup="emitEvent('mouseup', $event)"
-            @mousewheel="emitEvent('mousewheel', $event)"
-            @touchstart="emitEvent('touchstart', $event)"
-            @touchmove="emitEvent('touchmove', $event)"
-            @touchend="emitEvent('touchend', $event)"
-          >
-            {{ value }}
-          </div>
-          <!-- <div
-            v-else
-            class="gantt-elastic__task-list-item-value"
-            :style="valueStyle"
-            @click="emitEvent('click', $event)"
-            @mouseenter="emitEvent('mouseenter', $event)"
-            @mouseover="emitEvent('mouseover', $event)"
-            @mouseout="emitEvent('mouseout', $event)"
-            @mousemove="emitEvent('mousemove', $event)"
-            @mousedown="emitEvent('mousedown', $event)"
-            @mouseup="emitEvent('mouseup', $event)"
-            @mousewheel="emitEvent('mousewheel', $event)"
-            @touchstart="emitEvent('touchstart', $event)"
-            @touchmove="emitEvent('touchmove', $event)"
-            @touchend="emitEvent('touchend', $event)"
-            v-html="value"
-          ></div> -->
-        </template>
+        <div v-if="task.type === 'group'" class="gantt-elastic__task-list-item-group-value">
+          <template v-if="root.state.options.taskMapping.label === column.id">
+            <span class="group-value__label">
+              {{ groupValue.label }}
+            </span>
+            <span class="group-value__value">{{ value }}</span>
+          </template>
+        </div>
+        <slot v-else-if="column.customSlot" :name="column.customSlot" />
+        <div
+          v-else
+          class="gantt-elastic__task-list-item-value"
+          :style="valueStyle"
+          @click="emitEvent('click', $event)"
+          @mouseenter="emitEvent('mouseenter', $event)"
+          @mouseover="emitEvent('mouseover', $event)"
+          @mouseout="emitEvent('mouseout', $event)"
+          @mousemove="emitEvent('mousemove', $event)"
+          @mousedown="emitEvent('mousedown', $event)"
+          @mouseup="emitEvent('mouseup', $event)"
+          @mousewheel="emitEvent('mousewheel', $event)"
+          @touchstart="emitEvent('touchstart', $event)"
+          @touchmove="emitEvent('touchmove', $event)"
+          @touchend="emitEvent('touchend', $event)"
+        >
+          {{ value }}
+        </div>
       </div>
     </div>
   </div>
@@ -64,18 +53,6 @@ export default {
     return {}
   },
   computed: {
-    /**
-     * Should we display html or just text?
-     *
-     * @returns {boolean}
-     */
-    html() {
-      if (typeof this.column.html !== 'undefined' && this.column.html === true) {
-        return true
-      }
-      return false
-    },
-
     /**
      * Get column value
      *
@@ -116,6 +93,10 @@ export default {
         ...this.root.style['task-list-item-value'],
         ...this.column.style['task-list-item-value']
       }
+    },
+
+    groupValue() {
+      return this.root.getTaskListColumnsSilently.find((t) => t.id === this.task.condition) || {}
     }
   },
   methods: {
@@ -142,3 +123,15 @@ export default {
   }
 }
 </script>
+<style lang="scss">
+.gantt-elastic__task-list-item-group-value {
+  padding: 4px;
+  font-size: 12px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  .group-value__label {
+    color: #909399;
+  }
+}
+</style>

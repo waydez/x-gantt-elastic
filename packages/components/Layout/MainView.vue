@@ -14,7 +14,7 @@
       >
         <div
           class="gantt-elastic__container"
-          :style="{ ...root.style['container'] }"
+          :style="{ ...root.style['container'], position: 'relative' }"
           @mousemove="mouseMove"
           @mouseup="mouseUp"
         >
@@ -24,13 +24,46 @@
             class="gantt-elastic__task-list-container"
             :style="{
               ...root.style['task-list-container'],
-              width: root.state.options.taskList.finalWidth + 'px',
-              height: root.state.options.height + 'px'
+              width: root.state.options.taskList.viewWidth + 'px',
+              height: root.state.options.height + 'px',
+              overflow: 'auto hidden',
+              flex: `1 0 ${root.state.options.taskList.viewWidth}px`
             }"
           >
             <task-list>
               <template
-                v-for="column in root.getTaskListColumnsSilently"
+                v-for="column in root.getTaskListAllColumns"
+                v-slot:[column.customSlot]="scopeSlot"
+              >
+                <slot
+                  v-if="column.customSlot"
+                  :name="column.customSlot"
+                  :row="scopeSlot.row"
+                  :column="scopeSlot.column"
+                />
+              </template>
+            </task-list>
+          </div>
+          <!-- <div class="scroll-bar">
+            <div> 滚动条 </div>
+          </div> -->
+          <div
+            v-if="root.state.options.taskList.display && root.getTaskListLeftFixedColumns.length"
+            ref="taskListFixed"
+            class="gantt-elastic__task-list-container task-list-container__fixed"
+            :style="{
+              ...root.style['task-list-container'],
+              width: 94 * root.getTaskListLeftFixedColumns.length + 'px',
+              height: root.state.options.height - 14 + 'px',
+              overflow: 'hidden',
+              flex: `1 0 ${root.state.options.taskList.viewWidth}px`,
+              background: 'aliceblue',
+              'box-shadow': 'none'
+            }"
+          >
+            <task-list>
+              <template
+                v-for="column in root.getTaskListLeftFixedColumns"
                 v-slot:[column.customSlot]="scopeSlot"
               >
                 <slot
@@ -144,7 +177,7 @@ export default {
       if (!this.root.state.options.taskList.display) {
         return '0px'
       }
-      return this.root.state.options.taskList.finalWidth + 'px'
+      return this.root.state.options.taskList.viewWidth + 'px'
     },
 
     /**
@@ -203,10 +236,9 @@ export default {
    * Mounted
    */
   mounted() {
-    this.viewBoxWidth = this.$el.clientWidth
     this.root.state.refs.mainView = this.$refs.mainView
     this.root.state.refs.chartContainer = this.$refs.chartContainer
-    this.root.state.refs.taskList = this.$refs.taskList
+    // this.root.state.refs.taskList = this.$refs.taskList
     this.root.state.refs.chartScrollContainerHorizontal = this.$refs.chartScrollContainerHorizontal
     this.root.state.refs.chartScrollContainerVertical = this.$refs.chartScrollContainerVertical
     document.addEventListener('mouseup', this.chartMouseUp.bind(this))
@@ -355,6 +387,22 @@ export default {
         }
       }
     }
+  }
+  .task-list-container__fixed {
+    width: 150px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    .gantt-elastic__task-list-header {
+      display: block;
+    }
+  }
+  .scroll-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
   }
 }
 </style>

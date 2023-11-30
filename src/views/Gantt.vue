@@ -18,12 +18,26 @@
           </template>
         </ul>
       </div>
+      <div class="task-group">
+        <el-button icon="mdi-plus" type="text" @click="doGroupFilter">
+          {{ doGroup }}
+        </el-button>
+        <el-select v-model="groupCondition" multiple collapse-tags>
+          <el-option
+            v-for="item in options.columns"
+            :key="item.id"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
+      </div>
     </div>
     <div class="gantt-body">
       <gantt-elastic
         ref="ganttRef"
         :options="options"
-        :tasks="tasks"
+        :tasks="proxyTasks"
         :dynamic-style="dynamicStyle"
         @tasks-changed="tasksUpdate"
         @options-changed="optionsUpdate"
@@ -34,6 +48,11 @@
         </template> -->
         <template v-slot:uuid_planned_start="scopeSlot">
           <div>
+            {{ scopeSlot.row.uuid_planned_start }}
+          </div>
+        </template>
+        <template v-slot:uuid_planned_end="scopeSlot">
+          <div v-show="scopeSlot.row.type !== 'group'">
             {{ scopeSlot.row.uuid_planned_start }}
           </div>
         </template>
@@ -103,7 +122,10 @@ export default {
           type: 'task',
           label: 'Add task'
         }
-      ]
+      ],
+      groupCondition: [],
+      proxyTasks: tasks,
+      doGroup: '进行分组'
     }
   },
   computed: {},
@@ -111,7 +133,7 @@ export default {
     addItem(item) {
       const random = parseInt(Math.random() * 10)
       const plannedStart = getDate(24 * random)
-      this.tasks.push({
+      this.proxyTasks.push({
         type: item.type,
         id: this.lastId++,
         user: 'localhost',
@@ -171,6 +193,16 @@ export default {
     },
     formatDate(timestamp) {
       return dayjs(timestamp).format('YYYY-MM-DDTHH:mm:ss')
+    },
+    doGroupFilter() {
+      const condition = this.groupCondition
+      let tasks = []
+      if (!condition || !condition.length) {
+        tasks = this.tasks
+      } else {
+        tasks = this.$refs.ganttRef.handleFilterGroup(condition, this.tasks)
+      }
+      this.proxyTasks = tasks
     }
   }
 }
@@ -179,8 +211,30 @@ export default {
 <style lang="scss">
 .gantt {
   padding: 10px;
+  width: 100%;
+  // height: 100%;
+  box-sizing: border-box;
   .gantt-header {
     display: flex;
+    .task-group {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .el-button {
+        margin: 0 8px;
+      }
+      .el-select {
+        .el-input__inner {
+          padding: 0 12px;
+          height: 32px;
+          line-height: 32px;
+        }
+        .el-input__icon {
+          height: 32px;
+          line-height: 32px;
+        }
+      }
+    }
   }
   .gantt-body {
     width: 100%;

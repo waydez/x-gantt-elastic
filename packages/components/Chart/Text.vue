@@ -14,7 +14,6 @@
         :style="{ ...root.style['chart-row-text'] }"
       >
         <div
-          v-if="!html"
           class="gantt-elastic__chart-row-text-content gantt-elastic__chart-row-text-content--text"
           :style="{
             ...root.style['chart-row-text-content'],
@@ -24,16 +23,6 @@
         >
           <div>{{ task.label }}</div>
         </div>
-        <!-- <div
-          v-if="html"
-          class="gantt-elastic__chart-row-text-content gantt-elastic__chart-row-text-content--html"
-          :style="{
-            ...root.style['chart-row-text-content'],
-            ...root.style['chart-row-text-content--html'],
-            ...contentStyle
-          }"
-          v-html="task.label"
-        ></div> -->
       </div>
     </foreignObject>
   </svg>
@@ -81,22 +70,6 @@ export default {
      */
     contentStyle() {
       return { height: '100%', 'line-height': this.getHeight + 'px' }
-    },
-
-    /**
-     * Should we render text as html?
-     *
-     * @returns {boolean}
-     */
-    html() {
-      const cols = this.root.state.options.taskList.columns
-      for (let i = 0, len = cols.length; i < len; i++) {
-        const col = cols[i]
-        if (col.value === 'label' && typeof col.html !== 'undefined' && col.html) {
-          return true
-        }
-      }
-      return false
     }
   }
 }

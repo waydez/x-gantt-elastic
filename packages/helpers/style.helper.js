@@ -46,9 +46,10 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     'calendar-row-rect--hour': {},
     'calendar-row-rect-child': {
       display: 'block',
-      'border-right-width': '1px', // Calendar
-      'border-right-color': '#dadada',
-      'border-right-style': 'solid',
+      // 日期分割线条
+      // 'border-right-width': '1px', // Calendar
+      // 'border-right-color': '#dadada',
+      // 'border-right-style': 'solid',
       position: 'relative',
       // 避免字段收到了全局样式影响
       'text-align': 'left'
@@ -128,7 +129,10 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       fill: '#ffffffa0',
       stroke: '#000000A0'
     },
-    'task-list-container': {},
+    'task-list-container': {
+      'box-shadow': '#c6c6c6 0px 1px 5px',
+      'z-index': 1
+    },
     'task-list-header-label': {
       overflow: 'hidden',
       'text-overflow': 'ellipsis',
@@ -158,6 +162,7 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     'task-list-items': {
       overflow: 'hidden'
     },
+    // 任务内容的表格线条
     'task-list-item': {
       'border-top': '1px solid #eee',
       'border-right': '1px solid #eee',
@@ -199,16 +204,17 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       background: '#FFFFFF'
     },
     'grid-lines': {},
+    // todo 图表的线条样式
     'grid-line-horizontal': {
-      stroke: '#00000010',
+      stroke: '#eee',
       'stroke-width': 1
     },
     'grid-line-vertical': {
-      stroke: '#00000010',
+      stroke: '#eee',
       'stroke-width': 1
     },
     'grid-line-time': {
-      stroke: '#FF000080',
+      stroke: '#1b58e3',
       'stroke-width': 1
     },
     chart: {
@@ -258,7 +264,10 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     },
     'chart-row-project-wrapper': {},
     'chart-row-project': {},
-    'chart-row-project-polygon': {},
+    'chart-row-project-polygon': {
+      stroke: '#b1c4d5',
+      fill: '#b1c4d5'
+    },
     'chart-row-milestone-wrapper': {},
     'chart-row-milestone': {},
     'chart-row-milestone-polygon': {},
@@ -287,7 +296,8 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     },
     'chart-dependency-lines-wrapper': {},
     'chart-dependency-lines-path': {
-      fill: 'transparent',
+      // 设置 none, 避免 hover 事件触发异常
+      fill: 'none',
       stroke: '#FFa00090',
       'stroke-width': 2
     },
@@ -295,12 +305,17 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     'chart-scroll-container--horizontal': {
       overflow: 'auto',
       'max-width': '100%'
+      // 'margin-top': '-16px',
+      // position: 'relative',
+      // 'z-index': 10
     },
     'chart-scroll-container--vertical': {
       'overflow-y': 'auto',
       'overflow-x': 'hidden',
       'max-height': '100%',
-      float: 'right'
+      float: 'right',
+      position: 'relative',
+      'z-index': 1
     },
     'chart-days-highlight-rect': {
       fill: '#f3f5f780'

@@ -28,6 +28,7 @@
         type="chart"
       ></expander>
     </foreignObject>
+    <!-- 设置里程碑的宽度，避免因为时间维度的变化而变化 -->
     <svg
       class="gantt-elastic__chart-row-bar gantt-elastic__chart-row-milestone"
       :style="{
@@ -37,7 +38,7 @@
       }"
       :x="task.x"
       :y="task.y"
-      :width="task.width"
+      :width="getSvgWidth"
       :height="task.height"
       :viewBox="`0 0 ${task.width} ${task.height}`"
       xmlns="http://www.w3.org/2000/svg"
@@ -53,7 +54,7 @@
       @touchmove="emitEvent('touchmove', $event)"
       @touchend="emitEvent('touchend', $event)"
     >
-      <defs>
+      <!-- <defs>
         <clipPath :id="clipPathId">
           <polygon :points="getPoints"></polygon>
         </clipPath>
@@ -67,7 +68,18 @@
           ...task.style['chart-row-bar-polygon']
         }"
         :points="getPoints"
-      ></polygon>
+      ></polygon> -->
+      <path
+        class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-milestone-polygon"
+        :style="{
+          ...root.style['chart-row-bar-polygon'],
+          ...root.style['chart-row-milestone-polygon'],
+          ...task.style['base'],
+          ...task.style['chart-row-bar-polygon'],
+          stroke: 0
+        }"
+        :d="getPath"
+      ></path>
       <progress-bar :task="task" :clip-path="'url(#' + clipPathId + ')'"></progress-bar>
     </svg>
     <chart-text v-if="noPrefix && root.state.options.chart.text.display" :task="task"></chart-text>
@@ -107,6 +119,11 @@ export default {
       return 'gantt-elastic__milestone-clip-path-' + this.task.id
     },
 
+    getSvgWidth() {
+      const { width, height } = this.task
+      return Math.max(Number(width), Number(height))
+    },
+
     /**
      * Get points
      *
@@ -125,7 +142,27 @@ export default {
         ${task.width},${fifty}
         ${task.width - offset},${task.height}
         ${offset},${task.height}`
+    },
+    getPath() {
+      const { width, height } = this.task
+      const startX = width / 2
+      const cornerW = height / 3
+      const startY = height / 2 - cornerW
+      const borderRadius = 2
+      const borderW = cornerW - borderRadius * 2
+      return `
+        m ${startX + borderRadius},${startY + borderRadius}
+        l ${borderW},${borderW}
+        q ${borderRadius},${borderRadius} ${0},${borderRadius * 2}
+        l ${-borderW},${borderW}
+        q ${-borderRadius},${borderRadius} ${-borderRadius * 2},${0}
+        l ${-borderW},${-borderW}
+        q ${-borderRadius},${-borderRadius} ${0},${-borderRadius * 2}
+        l ${borderW},${-borderW}
+        q ${borderRadius},${-borderRadius} ${borderRadius * 2},${0}
+      `
     }
   }
 }
 </script>
+<style lang="scss"></style>

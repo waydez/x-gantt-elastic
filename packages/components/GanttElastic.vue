@@ -30,13 +30,14 @@ import {
   mergeDeepReactive,
   notEqualDeep,
   getOptions,
-  prepareStyle
+  prepareStyle,
+  ganttFormatGroup
 } from '@packages/helpers'
 import { TOGGLE_HANDLER } from '@packages/constant/index'
 import MainView from './Layout/MainView.vue'
 import ToolBar from './Layout/ToolBar.vue'
 import { GanttEngine } from '@packages/engine/index.js'
-// import { getWeekdays } from '@packages/utils/date-time.util'
+
 const ganttCanvas = document.createElement('canvas')
 const ctx = ganttCanvas.getContext('2d')
 let VueInst = VueInstance
@@ -111,7 +112,8 @@ export default {
         unwatchOutputStyle: null
       },
       TOGGLE_HANDLER,
-      ganttEngine: null
+      ganttEngine: null,
+      unwatchTaskListColumnsDisplay: null
     }
   },
   computed: {
@@ -180,7 +182,38 @@ export default {
     getTaskListColumnsSilently() {
       return this.state.options.taskList.columns.filter((c) => c.display)
     },
+    /**
+     * Get left-fixed columns silently
+     */
+    getTaskListLeftFixedColumns() {
+      const columns = this.getTaskListColumnsSilently
+      return columns.filter((c) => c.fixed === 'left')
+    },
 
+    /**
+     * Get right-fixed columns silently
+     */
+    getTaskListRightFixedColumns() {
+      const columns = this.getTaskListColumnsSilently
+      return columns.filter((c) => c.fixed === 'right')
+    },
+
+    /**
+     * Get right-fixed columns silently
+     */
+    getTaskListNoFixedColumns() {
+      const columns = this.getTaskListColumnsSilently
+      return columns.filter((c) => !c.fixed)
+    },
+
+    /**
+     * Get sorted-columns that not include right-fixed columns silently
+     */
+    getTaskListAllColumns() {
+      const leftFixedCols = this.getTaskListLeftFixedColumns
+      const noFixedCols = this.getTaskListNoFixedColumns
+      return [...leftFixedCols, ...noFixedCols]
+    },
     /**
      * Get columns and compute dimensions on the fly
      */
@@ -267,6 +300,8 @@ export default {
     this.state.unwatchOutputTasks = this.$watch(
       'outputTasks',
       (tasks) => {
+        // console.log('outputTasks changed')
+        // this.onTaskListColumnWidthChange()
         this.$emit(
           'tasks-changed',
           tasks.map((task) => task)
@@ -314,6 +349,13 @@ export default {
     this.$root.$emit('gantt-elastic-mounted', this)
     this.$emit('mounted', this)
     this.$root.$emit('gantt-elastic-ready', this)
+
+    this.unwatchTaskListColumnsDisplay = this.$watch(
+      'getTaskListColumnsSilently.length',
+      (val, oldVal) => {
+        if (val !== oldVal) this.calculateTaskListColumnsDimensions()
+      }
+    )
   },
 
   /**
@@ -343,6 +385,7 @@ export default {
     this.state.unwatchOutputTasks()
     this.state.unwatchOutputOptions()
     this.state.unwatchOutputStyle()
+    this.unwatchTaskListColumnsDisplay()
     this.$emit('before-destroy')
   },
 
@@ -514,11 +557,26 @@ export default {
      * 识别外部 options 配置，进行整合
      */
     handleFormatOptions(opts) {
-      const config = { taskList: {} }
+      const config = { taskList: {}, row: {}, chart: { grid: { horizontal: {} } } }
       config.locale = opts.locale
       config.taskMapping = opts.taskMapping
-      config.maxRows = opts.maxRows
-      config.maxHeight = opts.maxHeight
+      if (typeof opts.maxHeight === 'number') {
+        config.maxRows = opts.maxRows
+      } else console.warn('The type of maxRows is not number')
+
+      if (typeof opts.rowHeight === 'number') {
+        config.row.height = opts.rowHeight
+      } else console.warn('The type of rowHeight is not number')
+
+      if (typeof opts.horizontalGap === 'number') {
+        config.chart.grid.horizontal.gap = opts.horizontalGap
+      } else console.warn('The type of horizontalGap is not number')
+
+      const maxHeight = opts.maxHeight || opts.maxRows * (opts.rowHeight + opts.horizontalGap * 2)
+      if (typeof maxHeight === 'number') {
+        config.maxHeight = maxHeight
+      }
+
       config.taskList.columns = opts.columns
       return config
     },
@@ -618,12 +676,16 @@ export default {
     syncScrollTop() {
       if (
         this.state.refs.taskListItems &&
-        this.state.refs.chartGraph.scrollTop !== this.state.refs.taskListItems.scrollTop
+        this.state.refs.taskListItems.every(
+          (item) => item.scrollTop !== this.state.refs.chartGraph.scrollTop
+        )
       ) {
-        this.state.options.scroll.top =
-          this.state.refs.taskListItems.scrollTop =
-          this.state.refs.chartScrollContainerVertical.scrollTop =
-            this.state.refs.chartGraph.scrollTop
+        this.state.options.scroll.top = this.state.refs.chartScrollContainerVertical.scrollTop =
+          this.state.refs.chartGraph.scrollTop
+
+        this.state.refs.taskListItems.forEach((item) => {
+          item.scrollTop = this.state.refs.chartGraph.scrollTop
+        })
       }
     },
 
@@ -633,13 +695,14 @@ export default {
     calculateTaskListColumnsDimensions() {
       let final = 0
       let percentage = 0
-      for (let column of this.state.options.taskList.columns) {
+      const { columns, percent } = this.state.options.taskList
+      for (let column of columns) {
+        if (!column.display) continue
         if (column.expander) {
           column.widthFromPercentage =
-            ((this.getMaximalExpanderWidth() + column.width) / 100) *
-            this.state.options.taskList.percent
+            ((this.getMaximalExpanderWidth() + column.width) / 100) * percent
         } else {
-          column.widthFromPercentage = (column.width / 100) * this.state.options.taskList.percent
+          column.widthFromPercentage = (column.width / 100) * percent
         }
         percentage += column.widthFromPercentage
         column.finalWidth = (column.thresholdPercent * column.widthFromPercentage) / 100
@@ -850,11 +913,10 @@ export default {
      * @returns {boolean}
      */
     isInsideViewPort(x, width, buffer = 5000) {
+      const { left, right } = this.state.options.scroll.chart
       return (
-        (x + width + buffer >= this.state.options.scroll.chart.left &&
-          x - buffer <= this.state.options.scroll.chart.right) ||
-        (x - buffer <= this.state.options.scroll.chart.left &&
-          x + width + buffer >= this.state.options.scroll.chart.right)
+        (x + width + buffer >= left && x - buffer <= right) ||
+        (x - buffer <= left && x + width + buffer >= right)
       )
     },
 
@@ -868,6 +930,16 @@ export default {
         this.state.refs.chartScrollContainerHorizontal.scrollLeft,
         this.state.refs.chartScrollContainerVertical.scrollTop
       )
+    },
+
+    /**
+     * 刷新滚动
+     */
+    refreshScrollChart() {
+      const { left, top } = this.state.options.scroll.chart
+
+      this._onScrollChart(0, 0)
+      this.scrollTo(left, top)
     },
 
     /**
@@ -1028,13 +1100,18 @@ export default {
     onTaskListWidthChange(value) {
       this.state.options.taskList.percent = value
       this.calculateTaskListColumnsDimensions()
-      this.fixScrollPos()
+      this.state.options.taskList.display && this.fixScrollPos()
+    },
+
+    onTaskListViewWidthChange(value) {
+      this.state.options.taskList.viewWidth = value
     },
 
     /**
      * Task list column width change event handler
      */
     onTaskListColumnWidthChange() {
+      // console.log('taskList-column-width-change')
       this.calculateTaskListColumnsDimensions()
       this.fixScrollPos()
     },
@@ -1075,7 +1152,6 @@ export default {
      * TaskList Row click event handler
      */
     onTaskListRowClick(data) {
-      console.log('onTaskListRowClick', data)
       this.$emit('task-row-click', data)
     },
 
@@ -1083,7 +1159,6 @@ export default {
      * Chart row click event handler
      */
     onChartBlockRowClick(data) {
-      console.log('onChartBlockRowClick', data)
       this.$emit('chart-row-click', data)
     },
 
@@ -1107,6 +1182,7 @@ export default {
         { name: 'row-height-change', evt: this.onRowHeightChange },
         { name: 'scope-change', evt: this.onScopeChange },
         { name: 'taskList-width-change', evt: this.onTaskListWidthChange },
+        { name: 'taskList-view-width-change', evt: this.onTaskListViewWidthChange },
         { name: 'taskList-column-width-change', evt: this.onTaskListColumnWidthChange },
         { name: 'taskList-display-toggle', evt: this.onTaskListDisplayToggle },
         { name: 'chart-position-recenter', evt: this.onChartPositionRecenter },
@@ -1229,7 +1305,7 @@ export default {
      */
     computeCalendarWidths() {
       this.computeDayWidths()
-      this.computeHourWidths()
+      // this.computeHourWidths()
       this.computeMonthWidths()
     },
 
@@ -1400,6 +1476,7 @@ export default {
      * Setup and calculate everything
      */
     setup(itsUpdate = '') {
+      itsUpdate && this.refreshScrollChart()
       this.initialize(itsUpdate)
       this.prepareDates()
       this.initTimes()
@@ -1453,6 +1530,14 @@ export default {
         const found = this.state.tasks.find((v) => v.id === t.id)
         if (found) found.collapsed = collapsed
       })
+    },
+    /**
+     * 根据条件分组
+     */
+    handleFilterGroup(conditions, tasks) {
+      if (!conditions) return
+      const newTasks = ganttFormatGroup(tasks, conditions)
+      return newTasks
     }
   }
 }

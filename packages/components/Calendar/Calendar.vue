@@ -8,17 +8,12 @@
       :style="{ ...root.style['calendar'], width: root.state.options.width + 'px' }"
     >
       <calendar-row
-        v-if="root.state.options.calendar.month.display"
+        v-show="root.state.options.calendar.month.display"
         :items="dates.months"
         which="month"
       ></calendar-row>
-      <!-- <calendar-row
-        v-if="root.state.options.calendar.week.display"
-        :items="dates.days"
-        which="week"
-      ></calendar-row> -->
       <calendar-row
-        v-if="root.state.options.calendar.day.display"
+        v-show="root.state.options.calendar.day.display"
         :items="dates.days"
         which="day"
       ></calendar-row>
@@ -55,6 +50,15 @@ export default {
 
       this.calculateCalendarDimensions(allDates)
       return allDates
+    },
+    onlyMonth() {
+      const { day, month } = this.root.state.options.calendar
+      return (
+        // 判断calendar.month.display是否存在
+        month.display &&
+        // 判断calendar.day.display是否存在
+        !day.display
+      )
     }
   },
   methods: {
@@ -99,11 +103,13 @@ export default {
       const additionalSpace = stroke + 2
       let fullWidth = this.root.state.options.width
       let formatNames = Object.keys(this.root.state.options.calendar.day.format)
+      const useFormat = this.root.state.options.calendar.day.useFormat
       for (
         let days = this.root.state.options.times.steps.length;
         days > 1;
         days = Math.ceil(days / 2)
       ) {
+        if (useFormat) return { count: days, type: useFormat }
         for (let formatName of formatNames) {
           if (
             (this.root.state.options.calendar.day.maxWidths[formatName] + additionalSpace) * days <=
@@ -140,8 +146,10 @@ export default {
         this.root.state.options.times.firstTime,
         this.root.state.options.times.lastTime
       )
+      const useFormat = this.root.state.options.calendar.day.useFormat
       // todo
       if (monthsCount === 1) {
+        if (useFormat) return { count: 1, type: useFormat }
         for (let formatName of formatNames) {
           if (
             this.root.state.options.calendar.month.maxWidths[formatName] + additionalSpace <=
@@ -155,6 +163,7 @@ export default {
         }
       }
       for (let months = monthsCount; months > 1; months = Math.ceil(months / 2)) {
+        if (useFormat) return { count: months, type: useFormat }
         for (let formatName of formatNames) {
           if (
             (this.root.state.options.calendar.month.maxWidths[formatName] + additionalSpace) *
@@ -171,7 +180,7 @@ export default {
       }
       return {
         count: 0,
-        type: formatNames[0]
+        type: useFormat || formatNames[0]
       }
     },
 
@@ -314,7 +323,7 @@ export default {
       let formatNames = Object.keys(this.root.state.options.calendar.month.format)
       let currentDate = dayjs(this.root.state.options.times.firstTime)
       const presetMonth = this.root.state.options.calendar.month
-      const monthHeight = presetMonth.height
+      const monthHeight = presetMonth.height * (1 + this.onlyMonth)
       const lastTime = this.root.state.options.times.lastTime
 
       for (let monthIndex = 0; monthIndex < monthsCount.count; monthIndex++) {
@@ -376,15 +385,17 @@ export default {
      */
     calculateCalendarDimensions({ days, months }) {
       let height = 0
+      const { day, month } = this.root.state.options.calendar
       // if (this.root.state.options.calendar.hour.display && hours.length > 0) {
       //   height += this.root.state.options.calendar.hour.height
       // }
-      if (this.root.state.options.calendar.day.display && days.length > 0) {
-        height += this.root.state.options.calendar.day.height
+      if (day.display && days.length > 0) {
+        height += day.height
       }
-      if (this.root.state.options.calendar.month.display && months.length > 0) {
-        height += this.root.state.options.calendar.month.height
+      if (month.display && months.length > 0) {
+        height += month.height
       }
+      if (this.onlyMonth) height += month.height
       this.root.state.options.calendar.height = height
     }
   }
