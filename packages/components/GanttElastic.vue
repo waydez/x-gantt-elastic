@@ -25,19 +25,19 @@
 import ResizeObserver from 'resize-observer-polyfill'
 import VueInstance from 'vue'
 import dayjs from 'dayjs'
-import { cloneDeep } from 'lodash-es'
 import {
   mergeDeep,
   mergeDeepReactive,
   notEqualDeep,
   getOptions,
-  prepareStyle
+  prepareStyle,
+  ganttFormatGroup
 } from '@packages/helpers'
 import { TOGGLE_HANDLER } from '@packages/constant/index'
 import MainView from './Layout/MainView.vue'
 import ToolBar from './Layout/ToolBar.vue'
 import { GanttEngine } from '@packages/engine/index.js'
-import { minDateTime, maxDateTime } from '@packages/utils/datetime.util'
+
 const ganttCanvas = document.createElement('canvas')
 const ctx = ganttCanvas.getContext('2d')
 let VueInst = VueInstance
@@ -182,7 +182,38 @@ export default {
     getTaskListColumnsSilently() {
       return this.state.options.taskList.columns.filter((c) => c.display)
     },
+    /**
+     * Get left-fixed columns silently
+     */
+    getTaskListLeftFixedColumns() {
+      const columns = this.getTaskListColumnsSilently
+      return columns.filter((c) => c.fixed === 'left')
+    },
 
+    /**
+     * Get right-fixed columns silently
+     */
+    getTaskListRightFixedColumns() {
+      const columns = this.getTaskListColumnsSilently
+      return columns.filter((c) => c.fixed === 'right')
+    },
+
+    /**
+     * Get right-fixed columns silently
+     */
+    getTaskListNoFixedColumns() {
+      const columns = this.getTaskListColumnsSilently
+      return columns.filter((c) => !c.fixed)
+    },
+
+    /**
+     * Get sorted-columns that not include right-fixed columns silently
+     */
+    getTaskListAllColumns() {
+      const leftFixedCols = this.getTaskListLeftFixedColumns
+      const noFixedCols = this.getTaskListNoFixedColumns
+      return [...leftFixedCols, ...noFixedCols]
+    },
     /**
      * Get columns and compute dimensions on the fly
      */
@@ -526,12 +557,26 @@ export default {
      * 识别外部 options 配置，进行整合
      */
     handleFormatOptions(opts) {
-      const config = { taskList: {}, row: {} }
+      const config = { taskList: {}, row: {}, chart: { grid: { horizontal: {} } } }
       config.locale = opts.locale
       config.taskMapping = opts.taskMapping
-      config.maxRows = opts.maxRows
-      config.row.height = opts.rowHeight
-      config.maxHeight = opts.maxHeight || opts.maxRows * opts.rowHeight
+      if (typeof opts.maxHeight === 'number') {
+        config.maxRows = opts.maxRows
+      } else console.warn('The type of maxRows is not number')
+
+      if (typeof opts.rowHeight === 'number') {
+        config.row.height = opts.rowHeight
+      } else console.warn('The type of rowHeight is not number')
+
+      if (typeof opts.horizontalGap === 'number') {
+        config.chart.grid.horizontal.gap = opts.horizontalGap
+      } else console.warn('The type of horizontalGap is not number')
+
+      const maxHeight = opts.maxHeight || opts.maxRows * (opts.rowHeight + opts.horizontalGap * 2)
+      if (typeof maxHeight === 'number') {
+        config.maxHeight = maxHeight
+      }
+
       config.taskList.columns = opts.columns
       return config
     },
@@ -631,12 +676,16 @@ export default {
     syncScrollTop() {
       if (
         this.state.refs.taskListItems &&
-        this.state.refs.chartGraph.scrollTop !== this.state.refs.taskListItems.scrollTop
+        this.state.refs.taskListItems.every(
+          (item) => item.scrollTop !== this.state.refs.chartGraph.scrollTop
+        )
       ) {
-        this.state.options.scroll.top =
-          this.state.refs.taskListItems.scrollTop =
-          this.state.refs.chartScrollContainerVertical.scrollTop =
-            this.state.refs.chartGraph.scrollTop
+        this.state.options.scroll.top = this.state.refs.chartScrollContainerVertical.scrollTop =
+          this.state.refs.chartGraph.scrollTop
+
+        this.state.refs.taskListItems.forEach((item) => {
+          item.scrollTop = this.state.refs.chartGraph.scrollTop
+        })
       }
     },
 
@@ -1485,34 +1534,9 @@ export default {
     /**
      * 根据条件分组
      */
-    handleFilterGroup(condition, tasks) {
-      if (!condition) return
-      const cloneTasks = cloneDeep(tasks)
-      const map = new Map()
-      cloneTasks.forEach((item) => {
-        const key = item[condition]
-        if (!map.has(key)) map.set(key, [])
-        map.get(key).push(item)
-      })
-      const newTasks = []
-      const idProp = this.state.options.taskMapping.id
-      const labelProp = this.state.options.taskMapping.label
-      const startProp = this.state.options.taskMapping.plannedStart
-      const endProp = this.state.options.taskMapping.plannedEnd
-      for (const [key, value] of map.entries()) {
-        const min = minDateTime(value.map((v) => v[startProp]))
-        const max = maxDateTime(value.map((v) => v[endProp]))
-        newTasks.push({
-          [idProp]: 'uuid_group_' + key,
-          [labelProp]: key,
-          [startProp]: min,
-          [endProp]: max,
-          type: 'group',
-          condition
-        })
-        value.forEach((v) => (v.parentId = 'uuid_group_' + key))
-        newTasks.push(...value)
-      }
+    handleFilterGroup(conditions, tasks) {
+      if (!conditions) return
+      const newTasks = ganttFormatGroup(tasks, conditions)
       return newTasks
     }
   }

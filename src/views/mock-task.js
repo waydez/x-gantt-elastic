@@ -92,6 +92,17 @@ const tasks = [
     // duration: 15 * 24 * 60 * 60 * 1000,
     percent: 15,
     type: 'task'
+  },
+  {
+    id: 'uuid_008',
+    uuid_planned_start: '2023-11-11',
+    uuid_planned_end: '2023-11-20',
+    uuid_actual_start: '2023-11-13',
+    uuid_actual_end: '2023-11-21',
+    uuid_task_name: '任务为 8',
+    // duration: 15 * 24 * 60 * 60 * 1000,
+    percent: 85,
+    type: 'task'
   }
 ]
 
@@ -105,10 +116,11 @@ const options = {
     actualStart: 'uuid_actual_start',
     actualEnd: 'uuid_actual_end'
   },
-  // 若 maxHeight 为 0 或者 undefined，则使用 maxRows 和 rowHeight 计算最大高度
+  // 若 maxHeight 为 0 或者 undefined，则使用 maxRows , horizontalGap 和 rowHeight 计算最大高度
   maxHeight: 0,
-  maxRows: 20,
+  maxRows: 12,
   rowHeight: 36,
+  horizontalGap: 6,
   columns: [
     {
       id: 'uuid_task_name',
@@ -124,14 +136,16 @@ const options = {
       value: 'uuid_planned_start',
       display: true,
       width: 100,
-      customSlot: 'uuid_planned_start'
+      customSlot: 'uuid_planned_start',
+      fixed: 'left'
     },
     {
       id: 'uuid_planned_end',
       label: '计划结束时间',
       value: 'uuid_planned_end',
       display: true,
-      width: 100
+      width: 100,
+      fixed: 'left'
     },
     {
       id: 'uuid_actual_start',

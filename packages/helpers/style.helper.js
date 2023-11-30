@@ -313,7 +313,9 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       'overflow-y': 'auto',
       'overflow-x': 'hidden',
       'max-height': '100%',
-      float: 'right'
+      float: 'right',
+      position: 'relative',
+      'z-index': 1
     },
     'chart-days-highlight-rect': {
       fill: '#f3f5f780'

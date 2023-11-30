@@ -173,9 +173,9 @@ export function getOptions(localeName) {
         widths: [],
         maxWidths: { short: 0, medium: 0, long: 0 },
         // 默认自适应，设置后使用对应格式
+        // 配置为简洁版内容
         useFormat: 'short',
         format: {
-          // 配置为简洁版内容
           long(date) {
             return date.format('DD dddd')
           },
@@ -193,6 +193,7 @@ export function getOptions(localeName) {
         widths: [],
         maxWidths: { short: 0, medium: 0, long: 0 },
         // 默认自适应，设置后使用对应格式
+        // 配置为简洁版内容
         useFormat: 'short',
         format: {
           //*

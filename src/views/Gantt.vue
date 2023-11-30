@@ -19,10 +19,10 @@
         </ul>
       </div>
       <div class="task-group">
-        <el-button icon="mdi-plus" @click="doGroupFilter">
+        <el-button icon="mdi-plus" type="text" @click="doGroupFilter">
           {{ doGroup }}
         </el-button>
-        <el-select v-model="groupCondition" multiple>
+        <el-select v-model="groupCondition" multiple collapse-tags>
           <el-option
             v-for="item in options.columns"
             :key="item.id"
@@ -200,7 +200,7 @@ export default {
       if (!condition || !condition.length) {
         tasks = this.tasks
       } else {
-        tasks = this.$refs.ganttRef.handleFilterGroup(condition[0], this.tasks)
+        tasks = this.$refs.ganttRef.handleFilterGroup(condition, this.tasks)
       }
       this.proxyTasks = tasks
     }
@@ -220,6 +220,20 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
+      .el-button {
+        margin: 0 8px;
+      }
+      .el-select {
+        .el-input__inner {
+          padding: 0 12px;
+          height: 32px;
+          line-height: 32px;
+        }
+        .el-input__icon {
+          height: 32px;
+          line-height: 32px;
+        }
+      }
     }
   }
   .gantt-body {
