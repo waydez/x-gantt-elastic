@@ -128,6 +128,7 @@ const options = {
       value: 'uuid_task_name',
       display: true,
       expander: true,
+      fixed: 'left',
       width: 100
     },
     {
@@ -136,16 +137,16 @@ const options = {
       value: 'uuid_planned_start',
       display: true,
       width: 100,
-      customSlot: 'uuid_planned_start',
-      fixed: 'left'
+      fixed: 'left',
+      customSlot: 'uuid_planned_start'
     },
     {
       id: 'uuid_planned_end',
       label: '计划结束时间',
       value: 'uuid_planned_end',
       display: true,
-      width: 100,
-      fixed: 'left'
+      // fixed: 'left',
+      width: 100
     },
     {
       id: 'uuid_actual_start',

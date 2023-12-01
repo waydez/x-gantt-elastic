@@ -54,6 +54,7 @@
             :style="{
               ...root.style['task-list-container'],
               width: 94 * root.getTaskListLeftFixedColumns.length + 'px',
+              width: calcLeftFixedWidth + 'px',
               height: root.state.options.height - 14 + 'px',
               overflow: 'hidden',
               flex: `1 0 ${root.state.options.taskList.viewWidth}px`,
@@ -168,6 +169,15 @@ export default {
     }
   },
   computed: {
+    /**
+     * To calculate left fixed width
+     */
+    calcLeftFixedWidth() {
+      return this.root.getTaskListLeftFixedColumns.reduce((total, item) => {
+        return total + item.finalWidth
+      }, 0)
+    },
+
     /**
      * Get margin left
      *

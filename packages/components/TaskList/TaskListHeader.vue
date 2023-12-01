@@ -8,7 +8,7 @@
     }"
   >
     <div
-      v-for="column in root.getTaskListColumns"
+      v-for="column in root.getTaskListAllColumns"
       :key="column._id"
       class="gantt-elastic__task-list-header-column"
       :style="{
@@ -34,6 +34,7 @@
         {{ column.label }}
       </div>
       <div
+        v-if="false"
         class="gantt-elastic__task-list-header-resizer-wrapper"
         :style="{
           ...root.style['task-list-header-resizer-wrapper'],

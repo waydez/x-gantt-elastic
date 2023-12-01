@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import _ from 'lodash'
 import getStyle from './style.helper.js'
+import { minDateTime, maxDateTime } from '@packages/utils/datetime.util.js'
 
 /**
  * Helper function to determine if specified variable is an object
@@ -335,6 +336,32 @@ export function makeTaskTree(task, tasks) {
 export function ganttFormatGroup(tasks, conditions) {
   const r = ganttGroupBy(tasks, conditions)
   const f = _.flatMapDeep(r)
+  const parentsMap = new Map()
+  const childrenTasks = f.filter((o) => o.parentId)
+  childrenTasks.forEach((task) => {
+    const id = task.parentId
+    if (!parentsMap.has(id)) {
+      parentsMap.set(id, [task])
+    } else {
+      const springs = parentsMap.get(id)
+      springs.push(task)
+      parentsMap.set(id, springs)
+    }
+  })
+
+  let count = conditions.length
+  while (count--) {
+    f.forEach((item) => {
+      if (parentsMap.has(item.id)) {
+        const spring = parentsMap.get(item.id)
+        const start = minDateTime(spring.map((o) => o.uuid_planned_start))
+        const end = maxDateTime(spring.map((o) => o.uuid_planned_end))
+        item.uuid_planned_start = start
+        item.uuid_planned_end = end
+      }
+    })
+  }
+
   return f
 }
 const colConfigs = [
@@ -398,13 +425,14 @@ function ganttGroupBy(targetList, conditions, parentKey) {
             parentId: (parentKey || '') + key
           }
         })
-    const found = colConfigs.find(i => i.id === condition)
+    const found = colConfigs.find((i) => i.id === condition)
     groupTree.unshift({
       // todo taskMapping
       uuid_task_name: found.label + ':' + key,
       // uuid_task_name: condition, // fullKey,
       id: fullKey,
-      parentId: parentKey
+      parentId: parentKey,
+      type: 'group'
     })
     return groupTree
   })
