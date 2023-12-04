@@ -30,7 +30,7 @@
               flex: `1 0 ${root.state.options.taskList.viewWidth}px`
             }"
           >
-            <task-list>
+            <task-list :task-columns="root.getTaskListAllColumns">
               <template
                 v-for="column in root.getTaskListAllColumns"
                 v-slot:[column.customSlot]="scopeSlot"
@@ -49,11 +49,10 @@
           </div> -->
           <div
             v-if="root.state.options.taskList.display && root.getTaskListLeftFixedColumns.length"
-            ref="taskListFixed"
+            ref="taskListLeftFixed"
             class="gantt-elastic__task-list-container task-list-container__fixed"
             :style="{
               ...root.style['task-list-container'],
-              width: 94 * root.getTaskListLeftFixedColumns.length + 'px',
               width: calcLeftFixedWidth + 'px',
               height: root.state.options.height - 14 + 'px',
               overflow: 'hidden',
@@ -62,9 +61,38 @@
               'box-shadow': 'none'
             }"
           >
-            <task-list>
+            <task-list :task-columns="root.getTaskListLeftFixedColumns">
               <template
                 v-for="column in root.getTaskListLeftFixedColumns"
+                v-slot:[column.customSlot]="scopeSlot"
+              >
+                <slot
+                  v-if="column.customSlot"
+                  :name="column.customSlot"
+                  :row="scopeSlot.row"
+                  :column="scopeSlot.column"
+                />
+              </template>
+            </task-list>
+          </div>
+          <div
+            v-if="root.getTaskListRightFixedColumns.length"
+            ref="taskListRightFixed"
+            class="gantt-elastic__task-list-container task-list-container__right-fixed"
+            :style="{
+              ...root.style['task-list-container'],
+              width: calcRightFixedWidth + 'px',
+              height: root.state.options.height - 14 + 'px',
+              overflow: 'hidden',
+              flex: `1 0 ${root.state.options.taskList.viewWidth}px`,
+              background: 'aliceblue',
+              'box-shadow': 'none',
+              right: `calc(100% - ${root.state.options.taskList.viewWidth}px)`
+            }"
+          >
+            <task-list :task-columns="root.getTaskListRightFixedColumns">
+              <template
+                v-for="column in root.getTaskListRightFixedColumns"
                 v-slot:[column.customSlot]="scopeSlot"
               >
                 <slot
@@ -174,6 +202,15 @@ export default {
      */
     calcLeftFixedWidth() {
       return this.root.getTaskListLeftFixedColumns.reduce((total, item) => {
+        return total + item.finalWidth
+      }, 0)
+    },
+
+    /**
+     * To calculate right fixed width
+     */
+    calcRightFixedWidth() {
+      return this.root.getTaskListRightFixedColumns.reduce((total, item) => {
         return total + item.finalWidth
       }, 0)
     },
@@ -407,6 +444,11 @@ export default {
     .gantt-elastic__task-list-header {
       display: block;
     }
+  }
+  .task-list-container__right-fixed {
+    position: absolute;
+    top: 0;
+    overflow: hidden;
   }
   .scroll-bar {
     position: absolute;

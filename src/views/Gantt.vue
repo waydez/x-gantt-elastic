@@ -22,7 +22,7 @@
         <el-button icon="mdi-plus" type="text" @click="doGroupFilter">
           {{ doGroup }}
         </el-button>
-        <el-select v-model="groupCondition" multiple collapse-tags>
+        <el-select v-model="groupConditions" multiple collapse-tags>
           <el-option
             v-for="item in options.columns"
             :key="item.id"
@@ -123,7 +123,7 @@ export default {
           label: 'Add task'
         }
       ],
-      groupCondition: [],
+      groupConditions: [],
       proxyTasks: tasks,
       doGroup: '进行分组'
     }
@@ -131,15 +131,15 @@ export default {
   computed: {},
   methods: {
     addItem(item) {
-      const random = parseInt(Math.random() * 10)
-      const plannedStart = getDate(24 * random)
-      this.proxyTasks.push({
+      // const random = parseInt(Math.random() * 10)
+      const plannedStart = getDate(0)
+      const plannedEnd = getDate(24 * 2)
+      this.proxyTasks.unshift({
         type: item.type,
         id: this.lastId++,
-        user: 'localhost',
-        plannedStart,
-        duration: 10 * 24 * 60 * 60 * 1000,
-        percent: 30
+        uuid_planned_start: plannedStart,
+        uuid_planned_end: plannedEnd,
+        uuid_task_name: '新增任务item'
       })
     },
     tasksUpdate() {},
@@ -195,12 +195,12 @@ export default {
       return dayjs(timestamp).format('YYYY-MM-DDTHH:mm:ss')
     },
     doGroupFilter() {
-      const condition = this.groupCondition
+      const conditions = this.groupConditions
       let tasks = []
-      if (!condition || !condition.length) {
+      if (!conditions || !conditions.length) {
         tasks = this.tasks
       } else {
-        tasks = this.$refs.ganttRef.handleFilterGroup(condition, this.tasks)
+        tasks = this.$refs.ganttRef.handleFilterGroup(this.tasks, conditions, this.options)
       }
       this.proxyTasks = tasks
     }
@@ -225,7 +225,7 @@ export default {
       }
       .el-select {
         .el-input__inner {
-          padding: 0 12px;
+          padding: 0 24 0 0px;
           height: 32px;
           line-height: 32px;
         }

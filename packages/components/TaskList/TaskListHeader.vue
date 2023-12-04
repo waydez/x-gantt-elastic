@@ -8,7 +8,7 @@
     }"
   >
     <div
-      v-for="column in root.getTaskListAllColumns"
+      v-for="column in taskColumns"
       :key="column._id"
       class="gantt-elastic__task-list-header-column"
       :style="{
@@ -84,9 +84,13 @@ export default {
   components: {
     TaskListExpander
   },
-
   inject: ['root'],
-
+  props: {
+    taskColumns: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
       resizer: {

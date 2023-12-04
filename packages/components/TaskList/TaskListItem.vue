@@ -1,11 +1,6 @@
 <template>
   <div class="gantt-elastic__task-list-item" :style="{ ...root.style['task-list-item'] }">
-    <item-column
-      v-for="column in root.getTaskListColumnsSilently"
-      :key="column._id"
-      :column="column"
-      :task="task"
-    >
+    <item-column v-for="column in taskColumns" :key="column._id" :column="column" :task="task">
       <task-list-expander
         v-if="column.expander"
         :tasks="[task]"
@@ -33,6 +28,10 @@ export default {
     task: {
       type: Object,
       default: () => {}
+    },
+    taskColumns: {
+      type: Array,
+      default: () => []
     }
   },
   data() {

@@ -83,6 +83,7 @@ export function getOptions(localeName) {
     maxHeight: 0, //*
     chart: {
       grid: {
+        buffer: 20,
         horizontal: {
           gap: 6 //*
         }

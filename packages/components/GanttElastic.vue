@@ -31,7 +31,10 @@ import {
   notEqualDeep,
   getOptions,
   prepareStyle,
-  ganttFormatGroup
+  ganttFormatGroup,
+  fillTasks,
+  mapTasks,
+  makeTaskTree
 } from '@packages/helpers'
 import { TOGGLE_HANDLER } from '@packages/constant/index'
 import MainView from './Layout/MainView.vue'
@@ -212,7 +215,8 @@ export default {
     getTaskListAllColumns() {
       const leftFixedCols = this.getTaskListLeftFixedColumns
       const noFixedCols = this.getTaskListNoFixedColumns
-      return [...leftFixedCols, ...noFixedCols]
+      const rightFixedCols = this.getTaskListRightFixedColumns
+      return [...leftFixedCols, ...noFixedCols, ...rightFixedCols]
     },
     /**
      * Get columns and compute dimensions on the fly
@@ -423,137 +427,6 @@ export default {
     },
 
     /**
-     * Fill out empty task properties and make it reactive
-     *
-     * @param {array} tasks
-     */
-    fillTasks(tasks) {
-      for (let task of tasks) {
-        if (typeof task.plannedX === 'undefined') {
-          task.plannedX = 0
-        }
-        if (typeof task.actualX === 'undefined') {
-          task.actualX = 0
-        }
-        if (typeof task.plannedY === 'undefined') {
-          task.plannedY = 0
-        }
-        if (typeof task.actualY === 'undefined') {
-          task.actualY = 0
-        }
-        if (typeof task.plannedWidth === 'undefined') {
-          task.plannedWidth = 0
-        }
-        if (typeof task.actualWidth === 'undefined') {
-          task.plannedWidth = 0
-        }
-        if (typeof task.height === 'undefined') {
-          task.height = 0
-        }
-        if (typeof task.mouseOver === 'undefined') {
-          task.mouseOver = false
-        }
-        if (typeof task.collapsed === 'undefined') {
-          task.collapsed = false
-        }
-        if (typeof task.dependentOn === 'undefined') {
-          task.dependentOn = []
-        }
-        if (typeof task.parentId === 'undefined') {
-          task.parentId = null
-        }
-        if (typeof task.style === 'undefined') {
-          task.style = {}
-        }
-        if (typeof task.children === 'undefined') {
-          task.children = []
-        }
-        if (typeof task.allChildren === 'undefined') {
-          task.allChildren = []
-        }
-        if (typeof task.parents === 'undefined') {
-          task.parents = []
-        }
-        if (typeof task.parent === 'undefined') {
-          task.parent = null
-        }
-        // 计划
-        if (typeof task.plannedStartTime === 'undefined') {
-          task.plannedStartTime = dayjs(task.plannedStart).valueOf()
-        }
-        if (
-          typeof task.plannedEndTime === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'plannedEnd')
-        ) {
-          task.plannedEndTime = dayjs(task.plannedEnd).valueOf()
-        } else if (
-          typeof task.plannedEnd === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'plannedDuration')
-        ) {
-          task.plannedEndTime = task.plannedStartTime + task.plannedDuration
-        }
-        if (
-          typeof task.plannedDuration === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'plannedEndTime')
-        ) {
-          task.plannedDuration = task.plannedEndTime - task.plannedStartTime
-        }
-        // 实际
-        if (typeof task.actualStartTime === 'undefined') {
-          task.actualStartTime = task.actualStart && dayjs(task.actualStart).valueOf()
-        }
-        if (
-          typeof task.actualEndTime === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'actualEnd')
-        ) {
-          task.actualEndTime = task.actualEnd && dayjs(task.actualEnd).valueOf()
-        } else if (
-          typeof task.actualEnd === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'actualDuration')
-        ) {
-          task.actualEndTime = task.actualStartTime + task.actualDuration
-        }
-        if (
-          typeof task.actualDuration === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'actualEndTime')
-        ) {
-          task.actualDuration = task.actualEndTime - task.actualStartTime
-        }
-      }
-      return tasks
-    },
-
-    /**
-     * Map tasks
-     *
-     * @param {Array} tasks
-     * @param {Object} options
-     */
-    mapTasks(tasks, options) {
-      for (let [index, task] of tasks.entries()) {
-        // todo
-        tasks[index] = {
-          ...task,
-          id: task[options.taskMapping.id],
-          label: task[options.taskMapping.label],
-          // start: task[options.taskMapping.start],
-          plannedStart: task[options.taskMapping.plannedStart],
-          plannedEnd: task[options.taskMapping.plannedEnd],
-          actualStart: task[options.taskMapping.actualStart],
-          actualEnd: task[options.taskMapping.actualEnd],
-          // plannedDuration:
-          //   new Date(task[options.taskMapping.plannedEnd]).getTime() -
-          //   new Date(task[options.taskMapping.plannedStart]).getTime(),
-          progress: task[options.taskMapping.progress],
-          type: task[options.taskMapping.type],
-          style: task[options.taskMapping.style],
-          collapsed: task[options.taskMapping.collapsed]
-        }
-      }
-      return tasks
-    },
-
-    /**
      * 识别外部 options 配置，进行整合
      */
     handleFormatOptions(opts) {
@@ -615,10 +488,10 @@ export default {
       })
       this.state.options = options
       // tasks
-      let tasks = this.mapTasks(this.tasks, options)
-      tasks = this.fillTasks(tasks)
+      let tasks = mapTasks(this.tasks, options)
+      tasks = fillTasks(tasks)
       this.state.tasksById = this.resetTaskTree(tasks)
-      this.state.taskTree = this.makeTaskTree(this.state.rootTask, tasks)
+      this.state.taskTree = makeTaskTree(this.state.rootTask, tasks)
       this.state.tasks = this.state.taskTree.allChildren.map((childId) => this.getTask(childId))
       this.calculateTaskListColumnsDimensions()
       this.state.options.scrollBarHeight = this.getScrollBarHeight()
@@ -674,18 +547,17 @@ export default {
      * Synchronize scrollTop property when row height is changed
      */
     syncScrollTop() {
-      if (
+      const { scrollTop } = this.state.refs.chartGraph
+      const domsOfSync =
         this.state.refs.taskListItems &&
-        this.state.refs.taskListItems.every(
-          (item) => item.scrollTop !== this.state.refs.chartGraph.scrollTop
-        )
-      ) {
+        this.state.refs.taskListItems.filter((item) => item.scrollTop !== scrollTop)
+      if (domsOfSync && domsOfSync.length) {
         this.state.options.scroll.top = this.state.refs.chartScrollContainerVertical.scrollTop =
-          this.state.refs.chartGraph.scrollTop
-
-        this.state.refs.taskListItems.forEach((item) => {
-          item.scrollTop = this.state.refs.chartGraph.scrollTop
-        })
+          scrollTop
+        // dom.scrollTop = scrollTop
+        // dom.scrollTo(0, scrollTop)
+        // domsOfSync.forEach((dom) => dom.scrollTo(0, scrollTop))
+        domsOfSync.forEach((dom) => (dom.scrollTop = scrollTop))
       }
     },
 
@@ -736,35 +608,6 @@ export default {
         tasksById[current.id] = current
       }
       return tasksById
-    },
-
-    /**
-     * Make task tree, after reset - look above
-     *
-     * @param {object} task
-     * @returns {object} tasks with children and parents
-     */
-    makeTaskTree(task, tasks) {
-      for (let i = 0, len = tasks.length; i < len; i++) {
-        let current = tasks[i]
-        if (current.parentId === task.id) {
-          if (task.parents.length) {
-            task.parents.forEach((parent) => current.parents.push(parent))
-          }
-          if (!Object.prototype.propertyIsEnumerable.call(task, '__root')) {
-            current.parents.push(task.id)
-            current.parent = task.id
-          } else {
-            current.parents = []
-            current.parent = null
-          }
-          current = this.makeTaskTree(current, tasks)
-          task.allChildren.push(current.id)
-          task.children.push(current.id)
-          current.allChildren.forEach((childId) => task.allChildren.push(childId))
-        }
-      }
-      return task
     },
 
     /**
@@ -1534,9 +1377,9 @@ export default {
     /**
      * 根据条件分组
      */
-    handleFilterGroup(conditions, tasks) {
+    handleFilterGroup(tasks, conditions, options) {
       if (!conditions) return
-      const newTasks = ganttFormatGroup(tasks, conditions)
+      const newTasks = ganttFormatGroup(tasks, conditions, options)
       return newTasks
     }
   }
@@ -1570,11 +1413,19 @@ foreignObject > * {
 .gantt-elastic__main-view-container {
   position: relative;
 }
-.gantt-elastic__task-list-header-column:last-of-type {
+/* .gantt-elastic__task-list-header-column:last-of-type {
   border-right: 1px solid #00000050;
 }
 .gantt-elastic__task-list-item:last-of-type {
   border-bottom: 1px solid #00000050;
+} */
+/* 兼容虚拟滚动 dom 层级 */
+div:has(> .gantt-elastic__task-list-header-column):last-of-type {
+  border-right: 1px solid #00000050;
+}
+div:has(> .gantt-elastic__task-list-item):last-of-type {
+  /* 不能加，会导致虚拟滚动计算有问题 */
+  /* border-bottom: 1px solid #00000050; */
 }
 .gantt-elastic__task-list-item-value-wrapper:hover {
   overflow: visible !important;
@@ -1586,5 +1437,9 @@ foreignObject > * {
 }
 .gantt-elastic__task-list-item-value-wrapper:hover > .gantt-elastic__task-list-item-value {
   position: absolute;
+}
+.gantt-elastic__task-list .gantt-elastic__task-list-items > .virtual-list__client {
+  /* 避免任务列自行滚动，需要跟甘特图保持同步滚动 */
+  overflow: hidden !important;
 }
 </style>
