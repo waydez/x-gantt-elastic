@@ -54,6 +54,15 @@
               :task="task"
               :has-peer-line="hasPeerLine(task)"
             />
+            <!-- 今天的时间线 -->
+            <line
+              class="gantt-elastic__grid-line-time"
+              :style="{ ...root.style['grid-line-time'] }"
+              :x1="root.timeLinePosition.x"
+              :y1="root.timeLinePosition.y1"
+              :x2="root.timeLinePosition.x"
+              :y2="root.timeLinePosition.y2"
+            ></line>
           </svg>
         </div>
       </div>
@@ -130,7 +139,7 @@ export default {
   @include filterColor;
 }
 
-.gantt-elastic__grid-lines-wrapper .gantt-elastic__grid-lines .gantt-elastic__grid-line-time:hover {
+.gantt-elastic__grid-line-time:hover {
   @include filterColor;
   stroke-width: 2 !important;
 }

@@ -125,6 +125,7 @@ export function getOptions(localeName) {
           width: 40
         }
       ],
+      scrollLeft: 0,
       percent: 100, // 任务列表的宽度百分比
       width: 0,
       finalWidth: 0,

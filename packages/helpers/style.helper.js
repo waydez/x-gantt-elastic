@@ -7,8 +7,7 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     },
     'main-container-wrapper': {
       overflow: 'hidden',
-      'border-top': '1px solid #eee',
-      'border-bottom': '1px solid #eee'
+      outline: '#eee solid 1px'
     },
     'main-container': {
       float: 'left',
@@ -74,7 +73,7 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       'user-select': 'none',
       'vertical-align': 'middle',
       'border-bottom': '1px solid #eee',
-      'border-left': '1px solid #eee'
+      // 'border-left': '1px solid #eee'
     },
     'task-list-header-column': {
       'border-left': '1px solid #00000050',
@@ -130,8 +129,8 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       stroke: '#000000A0'
     },
     'task-list-container': {
-      'box-shadow': '#c6c6c6 0px 1px 5px',
-      'z-index': 1
+      // 'box-shadow': '#c6c6c6 0px 1px 5px',
+      // 'z-index': 1
     },
     'task-list-header-label': {
       overflow: 'hidden',
@@ -173,7 +172,7 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     'task-list-item-column': {
       display: 'inline-flex',
       'flex-shrink': '0',
-      'border-left': '1px solid #00000050',
+      // 'border-left': '1px solid #00000050',
       'box-sizing': 'border-box',
       'border-color': '#eee'
     },
@@ -214,7 +213,7 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       'stroke-width': 1
     },
     'grid-line-time': {
-      stroke: '#1b58e3',
+      stroke: '#f44336',
       'stroke-width': 1
     },
     chart: {
@@ -231,15 +230,15 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       'user-select': 'none',
       overflow: 'hidden',
       'max-width': '100%',
-      'border-right': '1px solid #eee',
+      // 'border-right': '1px solid #eee',
       position: 'relative',
       'z-index': 1
     },
     'chart-graph-container': {
       'user-select': 'none',
       overflow: 'hidden',
-      'max-width': '100%',
-      'border-right': '1px solid #eee'
+      'max-width': '100%'
+      // 'border-right': '1px solid #eee'
     },
     'chart-area': {},
     'chart-graph': {

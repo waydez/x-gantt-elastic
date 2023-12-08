@@ -270,16 +270,12 @@ export default {
     if (!this.ganttEngine) throw Error('Gantt engine is not defined')
     this.initializeEvents()
     this.setup()
-    this.state.unwatchTasks = this.$watch(
-      'tasks',
-      (tasks) => {
-        const notEqual = notEqualDeep(tasks, this.outputTasks)
-        if (notEqual) {
-          this.setup('tasks')
-        }
-      },
-      { deep: true }
-    )
+    this.state.unwatchTasks = this.$watch('tasks', (tasks) => {
+      const notEqual = notEqualDeep(tasks, this.outputTasks)
+      if (notEqual) {
+        this.setup('tasks')
+      }
+    })
     this.state.unwatchOptions = this.$watch(
       'options',
       (opts) => {
@@ -304,14 +300,12 @@ export default {
     this.state.unwatchOutputTasks = this.$watch(
       'outputTasks',
       (tasks) => {
-        // console.log('outputTasks changed')
-        // this.onTaskListColumnWidthChange()
         this.$emit(
           'tasks-changed',
           tasks.map((task) => task)
         )
-      },
-      { deep: true }
+      }
+      // { deep: true }
     )
     this.state.unwatchOutputOptions = this.$watch(
       'outputOptions',
@@ -777,6 +771,17 @@ export default {
     },
 
     /**
+     * Task list container scroll event handler
+     */
+    onScrollTaskListContainer(ev) {
+      const scrollLeft = ev.target.scrollLeft
+      if (scrollLeft !== this.state.options.taskList.scrollLeft) {
+        this.state.options.taskList.scrollLeft = scrollLeft
+        this.state.refs.taskListContainer.scrollLeft = scrollLeft
+      }
+    },
+
+    /**
      * 刷新滚动
      */
     refreshScrollChart() {
@@ -1043,7 +1048,8 @@ export default {
         { name: 'chart-position-recenter', evt: this.onChartPositionRecenter },
         { name: 'chart-download-with-pic', evt: this.onChartDownloadWithPic },
         { name: 'taskList-row-click', evt: this.onTaskListRowClick },
-        { name: 'chartBlock-row-click', evt: this.onChartBlockRowClick }
+        { name: 'chartBlock-row-click', evt: this.onChartBlockRowClick },
+        { name: 'taskList-container-scroll-horizontal', evt: this.onScrollTaskListContainer }
       ]
       eventConfig.forEach((event) => this.$on(event.name, event.evt))
     },
