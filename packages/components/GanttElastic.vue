@@ -37,9 +37,9 @@ import {
   makeTaskTree
 } from '@packages/helpers'
 import { TOGGLE_HANDLER } from '@packages/constant/index'
+import { XGanttEngine } from '@packages/engine/index.js'
 import MainView from './Layout/MainView.vue'
 import ToolBar from './Layout/ToolBar.vue'
-import { GanttEngine } from '@packages/engine/index.js'
 
 const ganttCanvas = document.createElement('canvas')
 const ctx = ganttCanvas.getContext('2d')
@@ -57,7 +57,7 @@ initVue()
  * Main vue component
  */
 export default {
-  name: 'GanttElastic',
+  name: 'XGanttElastic',
   components: { MainView, ToolBar },
   props: {
     tasks: {
@@ -430,7 +430,8 @@ export default {
      * 识别外部 options 配置，进行整合
      */
     handleFormatOptions(opts) {
-      const config = { taskList: {}, row: {}, chart: { grid: { horizontal: {} } } }
+      const config = { title: '', taskList: {}, row: {}, chart: { grid: { horizontal: {} } } }
+      config.title = opts.title
       config.locale = opts.locale
       config.taskMapping = opts.taskMapping
       if (typeof opts.maxHeight === 'number') {
@@ -848,7 +849,13 @@ export default {
       if (top !== null) {
         this.state.refs.chartScrollContainerVertical.scrollTop = top
         this.state.refs.chartGraph.scrollTop = top
-        this.state.refs.taskListItems.scrollTop = top
+        const domsOfSync =
+          this.state.refs.taskListItems &&
+          this.state.refs.taskListItems.filter((item) => item.scrollTop !== top)
+        if (domsOfSync && domsOfSync.length) {
+          domsOfSync.forEach((dom) => (dom.scrollTop = top))
+        }
+
         this.state.options.scroll.top = top
         this.syncScrollTop()
       }
@@ -947,7 +954,12 @@ export default {
     },
 
     onTaskListViewWidthChange(value) {
-      this.state.options.taskList.viewWidth = value
+      const state = this.state
+      if (value > state.options.taskList.finalWidth) {
+        state.options.taskList.viewWidth = state.options.taskList.finalWidth
+        return
+      }
+      state.options.taskList.viewWidth = value
     },
 
     /**
@@ -1009,7 +1021,7 @@ export default {
      * init gantt engine
      */
     initEngine() {
-      this.ganttEngine = new GanttEngine()
+      this.ganttEngine = new XGanttEngine()
       return this.ganttEngine
     },
 
@@ -1409,6 +1421,7 @@ foreignObject > * {
 .gantt-elastic__main-view-container {
   overflow: hidden;
   max-width: 100%;
+  width: 100%;
 }
 .gantt-elastic__main-view-container {
   position: relative;

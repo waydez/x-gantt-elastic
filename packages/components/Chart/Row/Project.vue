@@ -64,7 +64,8 @@
           ...root.style['chart-row-bar-polygon'],
           ...root.style['chart-row-project-polygon'],
           ...task.style['base'],
-          ...task.style['chart-row-bar-polygon']
+          ...task.style['chart-row-bar-polygon'],
+          ...fillColor
         }"
         :d="getPath"
       ></path>
@@ -88,12 +89,7 @@ export default {
   },
   inject: ['root'],
   mixins: [taskMixin],
-  props: {
-    task: {
-      type: Object,
-      default: () => {}
-    }
-  },
+  props: {},
   data() {
     return {}
   },

@@ -6,6 +6,7 @@
  */
 export function getOptions(localeName) {
   return {
+    title: '甘特视图',
     slots: {
       header: {}
     },
@@ -64,7 +65,7 @@ export function getOptions(localeName) {
     // todo
     times: {
       timeScale: 24 * 60 * 1000,
-      timeZoom: 1.5,
+      timeZoom: 2.5,
       timePerPixel: 1,
       firstTime: new Date('2022-08-01').getTime(),
       lastTime: new Date('2024-05-31').getTime(),
@@ -77,7 +78,7 @@ export function getOptions(localeName) {
     },
     row: {
       // 甘特图中图形的单行高度
-      height: 36
+      height: 24
     },
     maxRows: 20, //*
     maxHeight: 0, //*
@@ -85,7 +86,7 @@ export function getOptions(localeName) {
       grid: {
         buffer: 20,
         horizontal: {
-          gap: 6 //*
+          gap: 7 //*
         }
       },
       progress: {

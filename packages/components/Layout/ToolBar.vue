@@ -1,31 +1,38 @@
 <template>
   <div class="gantt-tool-bar">
     <div class="gantt-tool-bar-left">
-      <div class="gantt-tool-bar__item gantt-only-workday">
+      <div class="gantt-tool-bar__item gantt-title">
+        <h2>{{ root.state.options.title }}</h2>
+      </div>
+      <!-- <div class="gantt-tool-bar__item gantt-only-workday">
         <label>{{ onlyWorkDay }}</label>
         <el-switch v-model="onlyDisplayWorkDay" />
-      </div>
-      <div class="gantt-tool-bar__item gantt-task-list-width">
+      </div> -->
+      <!-- <div class="gantt-tool-bar__item gantt-task-list-width">
         <label>{{ taskListWidth }}</label>
         <el-slider
           v-model="taskListWidthPercent"
           :min="200"
           :max="root.state.options.taskList.finalWidth"
         ></el-slider>
-      </div>
-      <div class="gantt-tool-bar__item gantt-download-pic">
-        <label>{{ exportPicture }}</label>
-        <i class="el-icon-download" @click.prevent="handleDownload"></i>
-      </div>
+      </div> -->
     </div>
     <div class="gantt-tool-bar-right">
+      <div class="gantt-tool-bar__item gantt-refresh">
+        <i class="el-icon-refresh" @click.prevent="handleRefresh"></i>
+        <span>{{ refresh }}</span>
+      </div>
+      <div class="gantt-tool-bar__item gantt-download-pic">
+        <i class="el-icon-download" @click.prevent="handleDownload"></i>
+        <span>{{ exportPicture }}</span>
+      </div>
       <div class="gantt-tool-bar__item gantt-today">
         <el-button type="text" size="mini" round @click.prevent="recenterPosition">
           {{ toNow }}
         </el-button>
       </div>
       <div class="gantt-tool-bar__item gantt-time-dimension">
-        <el-radio-group v-model="timeScale" size="mini">
+        <el-radio-group v-model="timeScale" size="mini" fill="#FFF" text-color="#000">
           <el-radio-button v-for="item in dimension" :key="item.label" :label="item.label">
             {{ item.text }}
           </el-radio-button>
@@ -50,7 +57,7 @@ const TIME_DIMENSION = {
     timeScale: 7 * 24 * 60 * 1000
   },
   day: {
-    timeZoom: 1.5,
+    timeZoom: 2.5,
     timeScale: 24 * 60 * 1000
   }
 }
@@ -62,6 +69,7 @@ export default {
   inject: ['root'],
   data() {
     return {
+      refresh: '刷新',
       onlyWorkDay: '仅展示工作日',
       taskListWidth: '任务列表宽度',
       exportPicture: '导出图片',
@@ -121,6 +129,9 @@ export default {
     this.viewWidth = this.root.state.options.taskList.viewWidth
   },
   methods: {
+    handleRefresh() {
+      this.root.$emit('chart-refresh')
+    },
     handleDownload() {
       this.root.$emit('chart-download-with-pic')
     },
@@ -166,6 +177,10 @@ export default {
   font-size: 12px;
   .gantt-tool-bar__item {
     margin: 0 12px;
+    &:first-child,
+    &:last-child {
+      margin: 0;
+    }
   }
   &-left {
     display: flex;
@@ -196,6 +211,14 @@ export default {
         margin-left: -14px;
       }
     }
+  }
+  &-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    .gantt-refresh {
+      cursor: pointer;
+    }
     .gantt-download-pic {
       display: flex;
       // justify-content: space-between;
@@ -209,13 +232,19 @@ export default {
         }
       }
     }
-  }
-  &-right {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
     .gantt-time-dimension {
       margin-left: 10px;
+      .el-radio-group {
+        background: #eee;
+        border-radius: 4px;
+        .el-radio-button__inner {
+          border: none !important;
+          background: #eee;
+          // color: #fff;
+          border-radius: 4px;
+          margin: 1px;
+        }
+      }
     }
   }
 }

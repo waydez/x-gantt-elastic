@@ -219,13 +219,21 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     },
     chart: {
       'user-select': 'none',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      position: 'absolute',
+      right: 0,
+      left: 0,
+      bottom: 0,
+      top: 0,
+      width: '100%'
     },
     'chart-calendar-container': {
       'user-select': 'none',
       overflow: 'hidden',
       'max-width': '100%',
-      'border-right': '1px solid #eee'
+      'border-right': '1px solid #eee',
+      position: 'relative',
+      'z-index': 1
     },
     'chart-graph-container': {
       'user-select': 'none',
@@ -265,15 +273,27 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     'chart-row-project-wrapper': {},
     'chart-row-project': {},
     'chart-row-project-polygon': {
-      stroke: '#b1c4d5',
-      fill: '#b1c4d5'
+      stroke: '#B0BACE',
+      fill: '#B0BACE'
+    },
+    'chart-row-group-wrapper': {},
+    'chart-row-group': {},
+    'chart-row-group-polygon': {
+      stroke: '#B0BACE',
+      fill: '#B0BACE'
     },
     'chart-row-milestone-wrapper': {},
     'chart-row-milestone': {},
-    'chart-row-milestone-polygon': {},
+    'chart-row-milestone-polygon': {
+      stroke: '#1F4399',
+      fill: '#1F4399'
+    },
     'chart-row-task-wrapper': {},
     'chart-row-task': {},
-    'chart-row-task-polygon': {},
+    'chart-row-task-polygon': {
+      stroke: '#3370FF',
+      fill: '#3370FF'
+    },
     'chart-row-progress-bar-wrapper': {},
     'chart-row-progress-bar': {},
     'chart-row-progress-bar-line': {

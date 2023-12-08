@@ -1,2 +1,2 @@
-import GanttEngine from './gantt.engine'
-export { GanttEngine }
+import XGanttEngine from './gantt.engine'
+export { XGanttEngine }

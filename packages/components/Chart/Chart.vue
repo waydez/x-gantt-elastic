@@ -48,50 +48,12 @@
             <!-- 依赖线 -->
             <dependency-lines :tasks="root.visibleTasks"></dependency-lines>
             <!-- 具体任务块 -->
-            <g
+            <chart-item
               v-for="task in root.visibleTasks"
               :key="task.id"
               :task="task"
-              class="gantt-elastic__chart-row-wrapper"
-              :style="{ ...root.style['chart-row-wrapper'] }"
-              @click="chartRowClick($event, task)"
-            >
-              <component
-                :is="task.type"
-                :task="{
-                  style: task.style,
-                  x: task.plannedX,
-                  y: task.plannedY,
-                  width: task.plannedWidth,
-                  height: task.height / (1 + hasPeerLine(task)),
-                  id: task.id,
-                  allChildren: task.allChildren,
-                  label: task.label,
-                  progress: task.progress,
-                  collapsed: task.collapsed
-                }"
-              ></component>
-              <!-- 如果没有实际进度，则全显示计划进度  -->
-              <template v-if="hasPeerLine(task)">
-                <!-- 实际进度不显示展开收起 -->
-                <component
-                  :is="task.type"
-                  :noPrefix="true"
-                  :task="{
-                    style: task.style,
-                    x: task.actualX,
-                    y: task.actualY + task.height / 2 + 2,
-                    width: task.actualWidth,
-                    height: task.height / 2,
-                    id: task.id,
-                    allChildren: task.allChildren,
-                    label: task.label,
-                    progress: task.progress,
-                    collapsed: task.collapsed
-                  }"
-                ></component>
-              </template>
-            </g>
+              :has-peer-line="hasPeerLine(task)"
+            />
           </svg>
         </div>
       </div>
@@ -104,10 +66,7 @@ import Grid from './Grid.vue'
 import DaysHighlight from './DaysHighlight.vue'
 import Calendar from '../Calendar/Calendar.vue'
 import DependencyLines from './DependencyLines.vue'
-import Task from './Row/Task.vue'
-import Milestone from './Row/Milestone.vue'
-import Project from './Row/Project.vue'
-import Group from './Row/Group.vue'
+import ChartItem from './ChartItem.vue'
 
 export default {
   name: 'Chart',
@@ -115,10 +74,7 @@ export default {
     Grid,
     DependencyLines,
     Calendar,
-    Task,
-    Milestone,
-    Project,
-    Group,
+    ChartItem,
     DaysHighlight
   },
   inject: ['root'],
@@ -149,9 +105,6 @@ export default {
     this.root.state.refs.chartGraphSvg = this.$refs.chartGraphSvg
   },
   methods: {
-    chartRowClick(event, task) {
-      this.root.$emit('chartBlock-row-click', { event, task })
-    },
     hasPeerLine(task) {
       return task.type === 'task' && !!task.actualStartTime && !!task.actualEndTime
     }

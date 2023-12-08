@@ -37,9 +37,9 @@ pnpm publish --access public
 ```vue
 // 组件内按需引入
 <script>
-import { GanttElastic } from "@rabkit/x-gantt-elastic"
+import { XGanttElastic } from "@rabkit/x-gantt-elastic"
 export default {
-  components: { GanttElastic }
+  components: { XGanttElastic }
 }
 </script>
 
@@ -47,15 +47,15 @@ export default {
 
 ```js
 // main.js 中全量引入
-import GanttElasticPlugin from "@rabkit/x-gantt-elastic"
-Vue.use(GanttElasticPlugin)
+import XGanttElasticPlugin from "@rabkit/x-gantt-elastic"
+Vue.use(XGanttElasticPlugin)
 ```
 
 2. 组件
 
 
 ```vue
-<gantt-elastic
+<x-gantt-elastic
   :options="options"
   :tasks="tasks"
   :dynamic-style="dynamicStyle"
@@ -65,7 +65,7 @@ Vue.use(GanttElasticPlugin)
 >
   <template slot="header"></template>
   <template slot="footer"></template>
-</gantt-elastic>
+</x-gantt-elastic>
 ```
 
 3. 参数

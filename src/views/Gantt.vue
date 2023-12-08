@@ -34,7 +34,7 @@
       </div>
     </div>
     <div class="gantt-body">
-      <gantt-elastic
+      <x-gantt-elastic
         ref="ganttRef"
         :options="options"
         :tasks="proxyTasks"
@@ -59,7 +59,7 @@
         <template slot="footer">
           <custom-block />
         </template>
-      </gantt-elastic>
+      </x-gantt-elastic>
     </div>
   </div>
 </template>
@@ -68,7 +68,6 @@
 
 <script>
 import dayjs from 'dayjs'
-import GanttElastic from '@packages/components/GanttElastic.vue'
 // import GanttHeader from 'gantt-elastic-header'
 import CustomBlock from './custom-block.vue'
 import { getDate, tasks, options } from './mock-task.js'
@@ -77,8 +76,6 @@ import { getDate, tasks, options } from './mock-task.js'
 export default {
   name: 'Gantt',
   components: {
-    GanttElastic,
-    // GanttHeader,
     CustomBlock
   },
   data() {

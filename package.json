@@ -40,7 +40,6 @@
     "@babel/runtime": "^7.22.15",
     "@vue/babel-preset-app": "5",
     "@vue/cli-plugin-babel": "4",
-    "@vue/cli-plugin-eslint": "4",
     "@vue/cli-plugin-router": "4",
     "@vue/cli-plugin-vuex": "4",
     "@vue/cli-service": "4",

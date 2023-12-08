@@ -1,5 +1,9 @@
 export default {
   props: {
+    task: {
+      type: Object,
+      default: () => {}
+    },
     // 不显示前后的 expander 和 label
     noPrefix: {
       type: Boolean,
@@ -37,6 +41,15 @@ export default {
         expander.display ||
         (expander.displayIfTaskListHidden && !this.root.state.options.taskList.display)
       )
+    },
+
+    /**
+     *  Get current task fill color
+     */
+    fillColor() {
+      const { fillColor } = this.task
+      if (!fillColor) return {}
+      return { stroke: fillColor, fill: fillColor }
     }
   },
   methods: {

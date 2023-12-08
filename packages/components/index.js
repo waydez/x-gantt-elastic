@@ -1,3 +1,3 @@
-import GanttElastic from './GanttElastic.vue'
+import XGanttElastic from './GanttElastic.vue'
 
-export { GanttElastic }
+export { XGanttElastic }

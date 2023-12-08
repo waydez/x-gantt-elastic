@@ -1,18 +1,18 @@
 <template>
   <g
-    class="gantt-elastic__chart-row-bar-wrapper gantt-elastic__chart-row-project-wrapper"
+    class="gantt-elastic__chart-row-bar-wrapper gantt-elastic__chart-row-group-wrapper"
     :style="{
       ...root.style['chart-row-bar-wrapper'],
-      ...root.style['chart-row-project-wrapper'],
+      ...root.style['chart-row-group-wrapper'],
       ...task.style['chart-row-bar-wrapper']
     }"
   >
     <foreignObject
       v-if="!noPrefix && displayExpander"
-      class="gantt-elastic__chart-expander gantt-elastic__chart-expander--project"
+      class="gantt-elastic__chart-expander gantt-elastic__chart-expander--group"
       :style="{
         ...root.style['chart-expander'],
-        ...root.style['chart-expander--project'],
+        ...root.style['chart-expander--group'],
         ...task.style['chart-expander']
       }"
       :x="
@@ -29,10 +29,10 @@
       ></expander>
     </foreignObject>
     <svg
-      class="gantt-elastic__chart-row-bar gantt-elastic__chart-row-project"
+      class="gantt-elastic__chart-row-bar gantt-elastic__chart-row-group"
       :style="{
         ...root.style['chart-row-bar'],
-        ...root.style['chart-row-project'],
+        ...root.style['chart-row-group'],
         ...task.style['chart-row-bar']
       }"
       :x="task.x"
@@ -59,12 +59,13 @@
         </clipPath>
       </defs> -->
       <path
-        class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-project-polygon"
+        class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-group-polygon"
         :style="{
           ...root.style['chart-row-bar-polygon'],
-          ...root.style['chart-row-project-polygon'],
+          ...root.style['chart-row-group-polygon'],
           ...task.style['base'],
-          ...task.style['chart-row-bar-polygon']
+          ...task.style['chart-row-bar-polygon'],
+          ...fillColor
         }"
         :d="getPath"
       ></path>
@@ -88,12 +89,7 @@ export default {
   },
   inject: ['root'],
   mixins: [taskMixin],
-  props: {
-    task: {
-      type: Object,
-      default: () => {}
-    }
-  },
+  props: {},
   data() {
     return {}
   },

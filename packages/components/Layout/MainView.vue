@@ -120,7 +120,7 @@
             <!-- 可以表格高度居中 root.state.options.rowsHeight / 2  -->
             <div
               class="gantt-elastic__toggle-handler"
-              :style="{ top: `${calendarRect.height + calendarRect.gap}px` }"
+              :style="{ top: `${0}px` }"
               @click="toggleTaskList"
             >
               <img
@@ -128,6 +128,24 @@
                 class="toggle-handler-icon"
                 :class="{ 'toggle-handler-icon-reverse': toggleDisplay }"
               />
+            </div>
+            <div class="gantt-elastic__scroll-handler-container" :style="getContainerStyle">
+              <template v-for="item in root.visibleTasks">
+                <div
+                  v-show="!item.visible"
+                  :key="item.id"
+                  class="gantt-elastic__scroll-handler"
+                  :style="{
+                    top: `${item.plannedY + item.height / 2}px`,
+                    ...calcStyle(item)
+                  }"
+                  @click="scrollToStart(item)"
+                >
+                  <!-- <span style="cursor: pointer">
+                    {{ item.direction === 'left' ? '<==' : '==>' }}
+                  </span> -->
+                </div>
+              </template>
             </div>
           </div>
         </div>
@@ -267,6 +285,17 @@ export default {
      */
     toggleDisplay() {
       return this.root.state.options.taskList.display
+    },
+
+    /**
+     *  Get container style
+     */
+    getContainerStyle() {
+      const calendarRect = this.calendarRect
+      return {
+        transform: `translateY(-${this.root.state.options.scroll.chart.top}px)`,
+        top: `${calendarRect.height + calendarRect.gap}px`
+      }
     }
   },
 
@@ -401,6 +430,23 @@ export default {
      */
     toggleTaskList() {
       this.root.$emit('taskList-display-toggle')
+    },
+    /**
+     * Get the handler position: left or right
+     */
+    calcStyle(item) {
+      if (item.direction === 'left') {
+        return {
+          left: `${0}px`
+        }
+      } else {
+        return {
+          right: `${this.root.state.options.scrollBarHeight}px`
+        }
+      }
+    },
+    scrollToStart(task) {
+      this.root.scrollTo(task.plannedX)
     }
   }
 }
@@ -431,6 +477,20 @@ export default {
         opacity: 0.5;
         &-reverse {
           transform: rotate(180deg);
+        }
+      }
+    }
+    .gantt-elastic__scroll-handler-container {
+      position: relative;
+      .gantt-elastic__scroll-handler {
+        position: absolute;
+        border-radius: 50%;
+        width: 10px;
+        height: 10px;
+        cursor: pointer;
+        background-color: rgb(33, 150, 243);
+        &:hover {
+          box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
         }
       }
     }
