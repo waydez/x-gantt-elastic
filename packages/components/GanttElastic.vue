@@ -116,7 +116,11 @@ export default {
       },
       TOGGLE_HANDLER,
       ganttEngine: null,
-      unwatchTaskListColumnsDisplay: null
+      unwatchTaskListColumnsDisplay: null,
+      headerColResizer: {
+        moving: false,
+        x: 0
+      }
     }
   },
   computed: {
@@ -966,14 +970,28 @@ export default {
       }
       state.options.taskList.viewWidth = value
     },
-
+    /**
+     * Task list column width change start event handler
+     */
+    onTaskListColumnWidthChangeStart({ x, moving }) {
+      this.headerColResizer.moving = moving
+      this.headerColResizer.x = x
+    },
     /**
      * Task list column width change event handler
      */
-    onTaskListColumnWidthChange() {
-      // console.log('taskList-column-width-change')
+    onTaskListColumnWidthChange({ x, moving }) {
+      this.headerColResizer.moving = moving
+      this.headerColResizer.x = x
+    },
+    /**
+     * Task list column width change stop event handler
+     */
+    onTaskListColumnWidthChangeStop({ x, moving }) {
+      this.headerColResizer.moving = moving
+      this.headerColResizer.x = x
       this.calculateTaskListColumnsDimensions()
-      this.fixScrollPos()
+      // this.fixScrollPos()
     },
 
     /**
@@ -1043,7 +1061,9 @@ export default {
         { name: 'scope-change', evt: this.onScopeChange },
         { name: 'taskList-width-change', evt: this.onTaskListWidthChange },
         { name: 'taskList-view-width-change', evt: this.onTaskListViewWidthChange },
+        { name: 'taskList-column-width-change-start', evt: this.onTaskListColumnWidthChangeStart },
         { name: 'taskList-column-width-change', evt: this.onTaskListColumnWidthChange },
+        { name: 'taskList-column-width-change-stop', evt: this.onTaskListColumnWidthChangeStop },
         { name: 'taskList-display-toggle', evt: this.onTaskListDisplayToggle },
         { name: 'chart-position-recenter', evt: this.onChartPositionRecenter },
         { name: 'chart-download-with-pic', evt: this.onChartDownloadWithPic },

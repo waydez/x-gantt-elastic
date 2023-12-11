@@ -24,6 +24,7 @@
     "mitt": "^3.0.0",
     "pinyin-pro": "^3.11.0",
     "resize-observer-polyfill": "^1.5.1",
+    "throttle-debounce": "^5.0.0",
     "vue": "^2.6.11",
     "vue-i18n": "^8.27.2",
     "vue-router": "^3.2.0",

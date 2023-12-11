@@ -15,71 +15,73 @@
         <div
           class="gantt-elastic__container"
           :style="{ ...root.style['container'], position: 'relative' }"
+          :class="`scrolling-${scrollPosition}`"
           @mousemove="resizerMove"
           @mouseup="resizerEnd"
         >
-          <div
-            v-show="root.state.options.taskList.display"
-            ref="taskListContainer"
-            class="gantt-elastic__task-list-container"
-            :style="calcFixedStyle"
-          >
-            <task-list :task-columns="root.getTaskListAllColumns">
-              <template
-                v-for="column in root.getTaskListAllColumns"
-                v-slot:[column.customSlot]="scopeSlot"
-              >
-                <slot
-                  v-if="column.customSlot"
-                  :name="column.customSlot"
-                  :row="scopeSlot.row"
-                  :column="scopeSlot.column"
-                />
-              </template>
-            </task-list>
-          </div>
-          <div
+          <task-list-container ref="taskListContainer" :task-columns="root.getTaskListAllColumns">
+            <template
+              v-for="column in root.getTaskListAllColumns"
+              v-slot:[column.customSlot]="scopeSlot"
+            >
+              <slot
+                v-if="column.customSlot"
+                :name="column.customSlot"
+                :row="scopeSlot.row"
+                :column="scopeSlot.column"
+              />
+            </template>
+          </task-list-container>
+          <task-list-container
             v-if="root.state.options.taskList.display && root.getTaskListLeftFixedColumns.length"
             ref="taskListLeftFixed"
-            class="gantt-elastic__task-list-container task-list-container__fixed"
-            :class="calcFixedShadow"
-            :style="calcFixedStyle"
+            class="task-list-container__fixed"
+            type="left-fixed"
+            :task-columns="root.getTaskListLeftFixedColumns"
           >
-            <task-list :task-columns="root.getTaskListLeftFixedColumns">
-              <template
-                v-for="column in root.getTaskListLeftFixedColumns"
-                v-slot:[column.customSlot]="scopeSlot"
-              >
-                <slot
-                  v-if="column.customSlot"
-                  :name="column.customSlot"
-                  :row="scopeSlot.row"
-                  :column="scopeSlot.column"
-                />
-              </template>
-            </task-list>
-          </div>
-          <div
+            <template
+              v-for="column in root.getTaskListLeftFixedColumns"
+              v-slot:[column.customSlot]="scopeSlot"
+            >
+              <slot
+                v-if="column.customSlot"
+                :name="column.customSlot"
+                :row="scopeSlot.row"
+                :column="scopeSlot.column"
+              />
+            </template>
+          </task-list-container>
+          <task-list-container
             v-if="root.state.options.taskList.display && root.getTaskListRightFixedColumns.length"
             ref="taskListRightFixed"
-            class="gantt-elastic__task-list-container task-list-container__right-fixed"
-            :class="calcRightFixedShadow"
-            :style="calcRightFixedStyle"
+            class="task-list-container__right-fixed"
+            type="right-fixed"
+            :task-columns="root.getTaskListRightFixedColumns"
           >
-            <task-list :task-columns="root.getTaskListRightFixedColumns">
-              <template
-                v-for="column in root.getTaskListRightFixedColumns"
-                v-slot:[column.customSlot]="scopeSlot"
-              >
-                <slot
-                  v-if="column.customSlot"
-                  :name="column.customSlot"
-                  :row="scopeSlot.row"
-                  :column="scopeSlot.column"
-                />
-              </template>
-            </task-list>
+            <template
+              v-for="column in root.getTaskListRightFixedColumns"
+              v-slot:[column.customSlot]="scopeSlot"
+            >
+              <slot
+                v-if="column.customSlot"
+                :name="column.customSlot"
+                :row="scopeSlot.row"
+                :column="scopeSlot.column"
+              />
+            </template>
+          </task-list-container>
+
+          <!-- START 任务列表 column 宽度设置 -->
+          <div
+            class="gantt-elastic__task-list-header-resizer-proxy"
+            :style="{
+              display: root.headerColResizer.moving ? 'block' : '',
+              left: root.headerColResizer.x + 'px'
+            }"
+          >
           </div>
+          <!-- END -->
+
           <!-- START 宽度自定义设置 -->
           <div v-if="toggleDisplay" class="gantt-elastic__task-list-resizer">
             <div
@@ -102,9 +104,9 @@
             :style="{ ...root.style['main-view-container'] }"
             @wheel.prevent="chartWheel"
           >
-            <!-- 
+            <!--
               !depreciated
-              @mousedown="chartMouseDown" @mousemove.prevent="chartMouseMove" @mouseup="chartMouseUp" 
+              @mousedown="chartMouseDown" @mousemove.prevent="chartMouseMove" @mouseup="chartMouseUp"
               @touchstart="chartMouseDown" @touchmove.prevent="chartMouseMove" @touchend="chartMouseUp"
             -->
             <chart></chart>
@@ -189,8 +191,9 @@
 </template>
 
 <script>
+import { throttle } from 'throttle-debounce'
 import toggleIcon from '@packages/assets/svg/toggle-list.svg'
-import TaskList from '../TaskList/TaskList.vue'
+import TaskListContainer from '../TaskList/TaskListContainer.vue'
 import Chart from '../Chart/Chart.vue'
 
 // let ignoreScrollEvents = false
@@ -198,7 +201,7 @@ import Chart from '../Chart/Chart.vue'
 export default {
   name: 'MainView',
   components: {
-    TaskList,
+    TaskListContainer,
     Chart
   },
   inject: ['root'],
@@ -219,28 +222,11 @@ export default {
         currentY: 0
       },
       resizing: false,
-      resizerLeft: 0
+      resizerLeft: 0,
+      scrollPosition: 'left'
     }
   },
   computed: {
-    /**
-     * To calculate left fixed width
-     */
-    calcLeftFixedWidth() {
-      return this.root.getTaskListLeftFixedColumns.reduce((total, item) => {
-        return total + item.finalWidth
-      }, 0)
-    },
-
-    /**
-     * To calculate right fixed width
-     */
-    calcRightFixedWidth() {
-      return this.root.getTaskListRightFixedColumns.reduce((total, item) => {
-        return total + item.finalWidth
-      }, 0)
-    },
-
     /**
      * Get margin left
      *
@@ -306,41 +292,6 @@ export default {
       }
     },
 
-    /**
-     *
-     */
-    calcFixedStyle() {
-      const root = this.root
-      const viewWidth = root.state.options.taskList.viewWidth
-      return {
-        width: this.calcLeftFixedWidth + 'px',
-        height: root.state.options.height + 'px',
-        flex: `1 0 ${viewWidth}px`
-      }
-    },
-
-    /**
-     *
-     */
-    calcFixedShadow() {
-      const { scrollLeft } = this.root.state.options.taskList
-      return scrollLeft > 0 ? 'fixed-shadow' : ''
-    },
-
-    /**
-     *
-     */
-    calcRightFixedStyle() {
-      const root = this.root
-      const viewWidth = root.state.options.taskList.viewWidth
-      return {
-        width: this.calcRightFixedWidth + 'px',
-        height: root.state.options.height + 'px',
-        flex: `1 0 ${viewWidth}px`,
-        right: `calc(100% - ${viewWidth}px)`
-      }
-    },
-
     scrollContainer() {
       return this.$refs.scrollContainerRef
     },
@@ -375,7 +326,7 @@ export default {
   mounted() {
     this.root.state.refs.mainView = this.$refs.mainView
     this.root.state.refs.chartContainer = this.$refs.chartContainer
-    this.root.state.refs.taskListContainer = this.$refs.taskListContainer
+    this.root.state.refs.taskListContainer = this.$refs.taskListContainer.$el
     this.root.state.refs.chartScrollContainerHorizontal = this.$refs.chartScrollContainerHorizontal
     this.root.state.refs.chartScrollContainerVertical = this.$refs.chartScrollContainerVertical
     document.addEventListener('mouseup', this.chartMouseUp.bind(this))
@@ -387,16 +338,16 @@ export default {
     /**
      * Emit event when mouse is moving inside main view
      */
-    mouseMove(event) {
-      this.root.$emit('main-view-mousemove', event)
-    },
+    // mouseMove(event) {
+    //   this.root.$emit('main-view-mousemove', event)
+    // },
 
     /**
      * Emit mouseup event inside main view
      */
-    mouseUp(event) {
-      this.root.$emit('main-view-mouseup', event)
-    },
+    // mouseUp(event) {
+    //   this.root.$emit('main-view-mouseup', event)
+    // },
 
     /**
      * Horizontal scroll event handler
@@ -410,7 +361,26 @@ export default {
      */
     onTaskListHorizontalScroll(ev) {
       this.root.$emit('taskList-container-scroll-horizontal', ev)
+
+      this.syncPosition()
     },
+
+    /**
+     * 同步滚动位置
+     */
+    syncPosition: throttle(100, function () {
+      const { scrollLeft } = this.root.state.options.taskList
+      const { scrollWidth, offsetWidth } = this.$refs.scrollContainerRef
+      const maxScrollLeftPosition = scrollWidth - offsetWidth - 1
+
+      if (scrollLeft >= maxScrollLeftPosition) {
+        this.scrollPosition = 'right'
+      } else if (scrollLeft === 0) {
+        this.scrollPosition = 'left'
+      } else {
+        this.scrollPosition = 'middle'
+      }
+    }),
 
     /**
      * Vertical scroll event handler
@@ -523,9 +493,11 @@ export default {
     },
     resizerStart(e) {
       e.preventDefault()
-      const offsetX = this.$parent.$el.getBoundingClientRect().left
-      this.resizerLeft = e.x - offsetX
-      this.resizing = true
+      if (!this.resizing) {
+        const offsetX = this.$parent.$el.getBoundingClientRect().left
+        this.resizerLeft = e.x - offsetX
+        this.resizing = true
+      }
     },
     resizerMove(e) {
       e.preventDefault()
@@ -546,45 +518,6 @@ export default {
 
 <style lang="scss">
 .gantt-elastic__main-view {
-  .gantt-elastic__task-list-container {
-    background: #fff;
-    z-index: 1;
-    overflow: hidden;
-    &.fixed-shadow {
-      box-shadow: #c6c6c6 0px 1px 5px;
-    }
-    .gantt-elastic__task-list-wrapper {
-      .gantt-elastic__task-list-item-column {
-        border-left: 1px solid #00000050;
-        &:first-child {
-          border-left: none;
-        }
-      }
-    }
-    &.task-list-container__fixed {
-      width: 150px;
-      position: absolute;
-      left: 0;
-      top: 0;
-      overflow: hidden;
-      .gantt-elastic__task-list-header {
-        display: block;
-      }
-      .gantt-elastic__task-list-wrapper .gantt-elastic__task-list-item-column {
-        &:first-child {
-          border-left: none;
-        }
-      }
-    }
-    &.task-list-container__right-fixed {
-      position: absolute;
-      top: 0;
-      overflow: hidden;
-      .gantt-elastic__task-list-wrapper .gantt-elastic__task-list-item-column {
-        border-left: 1px solid #00000050;
-      }
-    }
-  }
   .gantt-elastic__main-view-container {
     .gantt-elastic__toggle-handler {
       width: 24px;
@@ -597,8 +530,8 @@ export default {
       padding: 10px 4px;
       background: #f5f5f5;
       transition: box-shadow 250ms;
-      // box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);
-      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
+      box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);
+      // box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
       outline: #eee solid 1px;
       // border-color: #eee;
       border-top-right-radius: 4px;
@@ -609,7 +542,7 @@ export default {
       z-index: 1;
       &:hover {
         // box-shadow: 2px 2px 6px rgba(151, 125, 125, 0.15);
-        box-shadow: 0px 0px 6px #3370ff;
+        box-shadow: 2px 0px 5px #c6c6c6;
       }
       .toggle-handler-icon {
         opacity: 0.8;
@@ -633,21 +566,7 @@ export default {
       }
     }
   }
-  .task-list-container__fixed {
-    width: 150px;
-    position: absolute;
-    left: 0;
-    top: 0;
-    overflow: hidden;
-    .gantt-elastic__task-list-header {
-      display: block;
-    }
-  }
-  .task-list-container__right-fixed {
-    position: absolute;
-    top: 0;
-    overflow: hidden;
-  }
+
   // .scroll-bar {
   //   position: absolute;
   //   bottom: 0;
@@ -655,6 +574,14 @@ export default {
   //   z-index: 2;
   // }
 
+  .gantt-elastic__task-list-header-resizer-proxy {
+    display: none;
+    position: absolute;
+    background: #eee;
+    height: 100%;
+    width: 1px;
+    z-index: 3;
+  }
   .gantt-elastic__task-list-resizer,
   .gantt-elastic__task-list-resizer-proxy {
     height: 100%;
@@ -664,8 +591,10 @@ export default {
     width: 2px;
     z-index: 1;
     background: #eee;
+    cursor: pointer;
     &:hover {
       background: #3370ff;
+      box-shadow: 0 0 1px #3370ff;
     }
     &__inner {
       cursor: col-resize;

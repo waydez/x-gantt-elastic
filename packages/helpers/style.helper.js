@@ -72,16 +72,9 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       display: 'flex',
       'user-select': 'none',
       'vertical-align': 'middle',
-      'border-bottom': '1px solid #eee',
-      // 'border-left': '1px solid #eee'
+      'border-bottom': '1px solid #eee'
     },
-    'task-list-header-column': {
-      'border-left': '1px solid #00000050',
-      'box-sizing': 'border-box',
-      display: 'flex',
-      background: '#f3f5f7',
-      'border-color': 'transparent'
-    },
+    'task-list-header-column': {},
     'task-list-expander-wrapper': {
       display: 'inline-flex',
       'flex-shrink': '0',
@@ -143,12 +136,12 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       'vertical-align': 'middle'
     },
     'task-list-header-resizer-wrapper': {
-      background: 'transparent',
-      height: '100%',
-      width: '6px',
-      cursor: 'col-resize',
-      display: 'inline-flex',
-      'vertical-align': 'center'
+      // background: 'transparent',
+      // height: '100%',
+      // width: '2px',
+      // cursor: 'col-resize',
+      // display: 'inline-flex',
+      // 'vertical-align': 'center'
     },
     'task-list-header-resizer': { margin: 'auto 0px' },
     'task-list-header-resizer-dot': {

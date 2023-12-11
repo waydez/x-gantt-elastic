@@ -130,7 +130,7 @@ export function getOptions(localeName) {
       width: 0,
       finalWidth: 0,
       widthFromPercentage: 0,
-      minWidth: 180,
+      minWidth: 80,
       viewWidth: 400,
       expander: {
         type: 'task-list',
