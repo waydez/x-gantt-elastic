@@ -78,7 +78,7 @@ export function getOptions(localeName) {
     },
     row: {
       // 甘特图中图形的单行高度
-      height: 24
+      height: 30
     },
     maxRows: 20, //*
     maxHeight: 0, //*
@@ -86,7 +86,8 @@ export function getOptions(localeName) {
       grid: {
         buffer: 20,
         horizontal: {
-          gap: 7 //*
+          // 甘特图中图像上下之间的间距
+          gap: 4
         }
       },
       progress: {
@@ -254,4 +255,40 @@ export function getOptions(localeName) {
       }
     }
   }
+}
+/**
+ * 识别外部 options 配置，进行整合
+ */
+export function toIntegrateOptions(opts) {
+  const config = {
+    title: '',
+    times: {},
+    taskList: {},
+    row: {},
+    chart: { grid: { horizontal: {} } }
+  }
+  config.title = opts.title
+  config.locale = opts.locale
+  config.taskMapping = opts.taskMapping
+  config.times = opts.times
+
+  if (typeof opts.maxHeight === 'number') {
+    config.maxRows = opts.maxRows
+  } else console.warn('The type of maxRows is not number')
+
+  if (typeof opts.rowHeight === 'number') {
+    config.row.height = opts.rowHeight
+  } else console.warn('The type of rowHeight is not number')
+
+  if (typeof opts.horizontalGap === 'number') {
+    config.chart.grid.horizontal.gap = opts.horizontalGap
+  } else console.warn('The type of horizontalGap is not number')
+
+  const maxHeight = opts.maxHeight || opts.maxRows * (opts.rowHeight + opts.horizontalGap * 2)
+  if (typeof maxHeight === 'number') {
+    config.maxHeight = maxHeight
+  }
+
+  config.taskList.columns = opts.columns
+  return config
 }

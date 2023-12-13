@@ -48,7 +48,6 @@
       @mousemove="emitEvent('mousemove', $event)"
       @mousedown="emitEvent('mousedown', $event)"
       @mouseup="emitEvent('mouseup', $event)"
-      @mousewheel="emitEvent('mousewheel', $event)"
       @touchstart="emitEvent('touchstart', $event)"
       @touchmove="emitEvent('touchmove', $event)"
       @touchend="emitEvent('touchend', $event)"

@@ -49,12 +49,11 @@
       @mousemove="emitEvent('mousemove', $event)"
       @mousedown="emitEvent('mousedown', $event)"
       @mouseup="emitEvent('mouseup', $event)"
-      @mousewheel="emitEvent('mousewheel', $event)"
       @touchstart="emitEvent('touchstart', $event)"
       @touchmove="emitEvent('touchmove', $event)"
       @touchend="emitEvent('touchend', $event)"
     >
-      <!-- <defs>
+      <defs>
         <clipPath :id="clipPathId">
           <polygon :points="getPoints"></polygon>
         </clipPath>
@@ -65,11 +64,12 @@
           ...root.style['chart-row-bar-polygon'],
           ...root.style['chart-row-milestone-polygon'],
           ...task.style['base'],
-          ...task.style['chart-row-bar-polygon']
+          ...task.style['chart-row-bar-polygon'],
+          ...fillColor
         }"
         :points="getPoints"
-      ></polygon> -->
-      <path
+      ></polygon>
+      <!-- <path
         class="gantt-elastic__chart-row-bar-polygon gantt-elastic__chart-row-milestone-polygon"
         :style="{
           ...root.style['chart-row-bar-polygon'],
@@ -79,7 +79,7 @@
           stroke: 0
         }"
         :d="getPath"
-      ></path>
+      ></path> -->
       <progress-bar :task="task" :clip-path="'url(#' + clipPathId + ')'"></progress-bar>
     </svg>
     <chart-text v-if="noPrefix && root.state.options.chart.text.display" :task="task"></chart-text>
@@ -100,12 +100,7 @@ export default {
   },
   inject: ['root'],
   mixins: [taskMixin],
-  props: {
-    task: {
-      type: Object,
-      default: () => {}
-    }
-  },
+  props: {},
   data() {
     return {}
   },

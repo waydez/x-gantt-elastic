@@ -34,7 +34,8 @@ import {
   ganttFormatGroup,
   fillTasks,
   mapTasks,
-  makeTaskTree
+  makeTaskTree,
+  toIntegrateOptions
 } from '@packages/helpers'
 import { TOGGLE_HANDLER } from '@packages/constant/index'
 import { XGanttEngine } from '@packages/engine/index.js'
@@ -425,42 +426,13 @@ export default {
     },
 
     /**
-     * 识别外部 options 配置，进行整合
-     */
-    handleFormatOptions(opts) {
-      const config = { title: '', taskList: {}, row: {}, chart: { grid: { horizontal: {} } } }
-      config.title = opts.title
-      config.locale = opts.locale
-      config.taskMapping = opts.taskMapping
-      if (typeof opts.maxHeight === 'number') {
-        config.maxRows = opts.maxRows
-      } else console.warn('The type of maxRows is not number')
-
-      if (typeof opts.rowHeight === 'number') {
-        config.row.height = opts.rowHeight
-      } else console.warn('The type of rowHeight is not number')
-
-      if (typeof opts.horizontalGap === 'number') {
-        config.chart.grid.horizontal.gap = opts.horizontalGap
-      } else console.warn('The type of horizontalGap is not number')
-
-      const maxHeight = opts.maxHeight || opts.maxRows * (opts.rowHeight + opts.horizontalGap * 2)
-      if (typeof maxHeight === 'number') {
-        config.maxHeight = maxHeight
-      }
-
-      config.taskList.columns = opts.columns
-      return config
-    },
-
-    /**
      * Initialize component
      */
     initialize(itsUpdate = '') {
       // style
       if (Object.keys(this.state.dynamicStyle).length === 0) this.initializeStyle()
       // options
-      const selfConfigOptions = this.handleFormatOptions(this.options)
+      const selfConfigOptions = toIntegrateOptions(this.options)
       let options = mergeDeep(
         {},
         this.state.options,

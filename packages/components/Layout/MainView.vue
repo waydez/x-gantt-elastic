@@ -118,21 +118,8 @@
                 :class="{ 'toggle-handler-icon-reverse': !toggleDisplay }"
               />
             </div>
-            <!-- <div class="gantt-elastic__scroll-handler-container" :style="getContainerStyle">
-              <template v-for="item in root.visibleTasks">
-                <div
-                  v-show="!item.visible"
-                  :key="item.id"
-                  class="gantt-elastic__scroll-handler"
-                  :style="{
-                    top: `${item.plannedY + item.height / 2}px`,
-                    ...calcStyle(item)
-                  }"
-                  @click="scrollToStart(item)"
-                >
-                </div>
-              </template>
-            </div> -->
+            <!-- 跳转到时间开始节点 -->
+            <time-dot-handler ref="timeDotHandler" />
           </div>
         </div>
       </div>
@@ -195,6 +182,7 @@ import { throttle } from 'throttle-debounce'
 import toggleIcon from '@packages/assets/svg/toggle-list.svg'
 import TaskListContainer from '../TaskList/TaskListContainer.vue'
 import Chart from '../Chart/Chart.vue'
+import TimeDotHandler from './components/time-dot-handler.vue'
 
 // let ignoreScrollEvents = false
 
@@ -202,7 +190,8 @@ export default {
   name: 'MainView',
   components: {
     TaskListContainer,
-    Chart
+    Chart,
+    TimeDotHandler
   },
   inject: ['root'],
   data() {
@@ -386,6 +375,8 @@ export default {
      * Vertical scroll event handler
      */
     onVerticalScroll(ev) {
+      this.$refs.timeDotHandler &&
+        (this.$refs.timeDotHandler.$refs.taskListItems.$el.scrollTop = ev.target.scrollTop)
       this.root.$emit('chart-scroll-vertical', ev)
     },
 
@@ -488,9 +479,6 @@ export default {
         }
       }
     },
-    scrollToStart(task) {
-      this.root.scrollTo(task.plannedX)
-    },
     resizerStart(e) {
       e.preventDefault()
       if (!this.resizing) {
@@ -551,28 +539,7 @@ export default {
         }
       }
     }
-    .gantt-elastic__scroll-handler-container {
-      position: relative;
-      .gantt-elastic__scroll-handler {
-        position: absolute;
-        border-radius: 50%;
-        width: 10px;
-        height: 10px;
-        cursor: pointer;
-        background-color: rgb(33, 150, 243);
-        &:hover {
-          box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
-        }
-      }
-    }
   }
-
-  // .scroll-bar {
-  //   position: absolute;
-  //   bottom: 0;
-  //   left: 0;
-  //   z-index: 2;
-  // }
 
   .gantt-elastic__task-list-header-resizer-proxy {
     display: none;

@@ -137,7 +137,7 @@ export default {
       if (this.resizer.moving) {
         const offsetX = this.root.$el.getBoundingClientRect().left
         this.resizer.x = event.x - offsetX
-        console.log('this.resizer.x', this.resizer.x)
+
         this.root.$emit('taskList-column-width-change', {
           x: this.resizer.x,
           moving: this.resizer.moving
