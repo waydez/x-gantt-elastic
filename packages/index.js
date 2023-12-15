@@ -1,4 +1,4 @@
-import * as html2Image from 'html-to-image'
+// import * as html2Image from 'html-to-image'
 import htm2canvas from 'html2canvas'
 import { XGanttEngine } from './engine/index'
 import { XGanttElastic } from './components/index'
@@ -12,7 +12,11 @@ import { XGanttElastic } from './components/index'
 // import './vendor/element-ui'
 // import EventBus from './vendor/event-bus'
 
-XGanttElastic.install = (Vue, opts) => Vue.component(XGanttElastic.name, XGanttElastic)
+XGanttElastic.install = (Vue, opts) => {
+  Vue.component(XGanttElastic.name, XGanttElastic)
+  // Vue.prototype.$html2Image = html2Image
+  Vue.prototype.$htm2canvas = htm2canvas
+}
 
 const components = [XGanttElastic]
 
@@ -24,7 +28,7 @@ const install = (Vue, opts) => {
   components.forEach((item) => {
     Vue.component(item.name, item)
   })
-  Vue.prototype.$html2Image = html2Image
+  // Vue.prototype.$html2Image = html2Image
   Vue.prototype.$htm2canvas = htm2canvas
 }
 

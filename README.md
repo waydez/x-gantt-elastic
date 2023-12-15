@@ -70,22 +70,189 @@ Vue.use(XGanttElasticPlugin)
 
 3. 参数
 
-| 字段          | 类型   | 默认值 |
-| ------------- | ------ | ------ |
-| tasks         | Array  | []     |
-|               |        |        |
-| options       | Object |        |
-| - taskMapping | Object | {}     |
-| - maxRows     | Number | 100    |
-| - maxHeight   | Number | 900    |
-| - columns     | Array  | []     |
-| - locale      | Object | {}     |
-|               |        |        |
-| dynamic-style | Object | {}     |
+   **tasks**
 
-4. 事件
+   描述：当前甘特图的任务数据列表
 
-除了对外暴露 vue组件的生命周期外，还包括以下事件 
+   类型：`Array`
+
+   默认值：`[]`
+
+   ```js
+   // 数组项示例
+   {
+     id: '',
+     label: '',
+     plannedStart: '',
+     plannedEnd: '',
+     actualStart: '',
+     actualEnd: ''
+     type: 'task' | 'milestone' | 'group',
+     dependentOn: ['id1', 'id2'],
+     fillColor: '',
+     visible: true | false,
+     direction: 'left' | 'right'
+   }
+   ```
+
+   
+
+   **options**
+
+   - title
+
+     描述：当前甘特图的标题，位于甘特图左上方
+
+     类型：`String`
+
+     默认值：`''`
+
+   - taskMapping
+
+     描述：当前甘特图的任务字段映射列表
+
+     类型：`Object`
+
+     默认值：
+
+     ```js
+     {
+         id: 'id',
+         label: 'label',
+         plannedStart: 'plannedStart',
+         plannedEnd: 'plannedEnd',
+         actualStart: 'actualStart',
+         actualEnd: 'actualEnd'
+     },
+     ```
+
+   - maxRows
+
+     描述：当前甘特图容器可展示的最大行数，超过最大行数会显示滚动条
+
+     类型：`Number`
+
+     默认值：`20`
+
+   - rowHeight
+
+     描述：当前甘特图图形的行高
+
+     类型：`Number`
+
+     默认值：30`
+
+   - horizontalGap
+
+     描述：当前甘特图图形的行上下间距
+
+     类型：`Number`
+
+     默认值：`4`
+
+   - maxHeight
+
+     描述：当前甘特图最大高度，若 maxHeight 为 0 或者 undefined，则使用 maxRows , horizontalGap 和 rowHeight 计算最大高度
+
+     类型：`Number`
+
+     默认值：`0`
+
+   - columns
+
+     描述：当前甘特图的任务列信息
+
+     类型：`Array`
+
+     默认值：`[]`
+
+     ```js
+     // 配置项示例
+     {
+       id: 'uuid_task_name',
+       label: '任务详情',
+       value: 'uuid_task_name',
+       display: true | false,
+       expander: true | false,
+       fixed: 'left' | 'right',
+       width: 100
+     }
+     ```
+
+     
+
+   - locale
+
+     描述：当前甘特图中的文案配置信息
+
+     类型：`Object`
+
+     默认值：`{}`
+
+   
+
+   **dynamic-style**
+
+   类型：Object
+
+   默认值：{}
+
+   
+
+> 不推荐使用 `dynamic-style` 来设置组件中的样式，会影响调试的效率以及可能会产生无法预料的样式问题。
+>
+> 推荐使用外部样式加 `!important`进行覆盖，未来会将`dynamic-style`该配置完全迭代废弃掉。
+
+
+
+4. 回调事件
+
+**基本生命周期**
+
+- created
+- before-mount
+- ready
+- mounted
+- before-update
+- updated
+- before-destroy
+- destroyed
+
+**甘特图配置**
+
+- options-changed
+
+**任务列表相关**
+
+- tasks-changed
+- task-row-click
+- taskList-container-scroll-horizontal
+- taskList-display-toggle
+- taskList-view-width-change
+- taskList-row-click
+- taskList-column-width-change-start
+- taskList-column-width-change
+- taskList-column-width-change-stop
+
+**时间日期相关**
+
+- times-timeZoom-change
+- calendar-recalculate
+
+**图形图标相关**
+
+- chart-row-click
+- chart-refresh
+- chart-position-recenter
+- chart-scroll-horizontal
+- chart-scroll-vertical
+- chart-wheel
+
+
+
+
+
+
 
 | 方法                  | 描述               | 返回值        |
 | --------------------- | ------------------ | ------------- |
@@ -95,6 +262,7 @@ Vue.use(XGanttElasticPlugin)
 | task-row-click        | 任务行点击事件     | {event, task} |
 | chart-row-click       | 图形块的行点击事件 | {event, task} |
 | calendar-recalculate  | 日期计算事件       | void          |
+|                       |                    |               |
 
 5. 插槽
 
@@ -118,7 +286,12 @@ const tasks = [
 // 定义 options 中的 columns
 const options = {
   taskMapping: {
-    label: 'uuid_task_name'
+    id: 'id',
+    label: 'uuid_task_name',
+    plannedStart: 'uuid_planned_start',
+    plannedEnd: 'uuid_planned_end',
+    actualStart: 'uuid_actual_start',
+    actualEnd: 'uuid_actual_end'
   },
   columns: [
     {
