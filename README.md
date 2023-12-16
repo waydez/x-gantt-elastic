@@ -207,62 +207,46 @@ Vue.use(XGanttElasticPlugin)
 
 4. 回调事件
 
-**基本生命周期**
+   **基本生命周期**
 
-- created
-- before-mount
-- ready
-- mounted
-- before-update
-- updated
-- before-destroy
-- destroyed
+   - created
+   - before-mount
+   - ready
+   - mounted
+   - before-update
+   - updated
+   - before-destroy
+   - destroyed
 
-**甘特图配置**
+   **甘特图配置**
 
-- options-changed
+   - options-changed
 
-**任务列表相关**
+   **任务列表相关**
 
-- tasks-changed
-- task-row-click
-- taskList-container-scroll-horizontal
-- taskList-display-toggle
-- taskList-view-width-change
-- taskList-row-click
-- taskList-column-width-change-start
-- taskList-column-width-change
-- taskList-column-width-change-stop
+   - tasks-changed
+   - task-row-click
+   - taskList-container-scroll-horizontal
+   - taskList-display-toggle
+   - taskList-view-width-change
+   - taskList-row-click
+   - taskList-column-width-change-start
+   - taskList-column-width-change
+   - taskList-column-width-change-stop
 
-**时间日期相关**
+   **时间日期相关**
 
-- times-timeZoom-change
-- calendar-recalculate
+   - times-timeZoom-change
+   - calendar-recalculate
 
-**图形图标相关**
+   **图形图标相关**
 
-- chart-row-click
-- chart-refresh
-- chart-position-recenter
-- chart-scroll-horizontal
-- chart-scroll-vertical
-- chart-wheel
-
-
-
-
-
-
-
-| 方法                  | 描述               | 返回值        |
-| --------------------- | ------------------ | ------------- |
-| tasks-changed         | 任务项发生改变     | tasks         |
-| options-changed       | 配置项发生改变     | options       |
-| dynamic-style-changed | 样式组发生改变     | style         |
-| task-row-click        | 任务行点击事件     | {event, task} |
-| chart-row-click       | 图形块的行点击事件 | {event, task} |
-| calendar-recalculate  | 日期计算事件       | void          |
-|                       |                    |               |
+   - chart-row-click
+   - chart-refresh
+   - chart-position-recenter
+   - chart-scroll-horizontal
+   - chart-scroll-vertical
+   - chart-wheel
 
 5. 插槽
 

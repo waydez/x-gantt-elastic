@@ -36,8 +36,9 @@ const dataRange = [
   '2024-01-16',
   '2024-01-27'
 ]
-const n = 200
+const n = 100
 const tasks = []
+const colorPool = ['#409EFF', '#67C23A', '#E6A23C', '#F56C6C', '#909399', '#303133', '#F2F6FC']
 
 const randomDate = function () {
   const range = dataRange.length - 1
@@ -53,6 +54,12 @@ const randomPrevious = (max) => {
     set.add(id)
   }
   return [...set]
+}
+
+const randomColor = () => {
+  const range = colorPool.length - 1
+  const index = parseInt(Math.random() * range)
+  return colorPool[index]
 }
 
 for (let i = 0; i < n; i++) {
@@ -73,12 +80,13 @@ for (let i = 0; i < n; i++) {
       actualStart = randomDate()
       actualEnd = randomDate()
     }
-    dependentOn = (i > 10 && randomPrevious(i)) || []
+    // dependentOn = (i > 10 && randomPrevious(i)) || []
   }
   let type = 'task'
   const milestone = Math.random() > 0.9
   if (milestone) type = 'milestone'
 
+  const fillColor = '' // randomColor()
   const task = {
     id: 'uuid_' + i,
     uuid_planned_start: start,
@@ -87,12 +95,16 @@ for (let i = 0; i < n; i++) {
     uuid_actual_end: actualEnd,
     uuid_task_name: '任务为 ' + i,
     type,
-    dependentOn
+    dependentOn,
+    fillColor,
+    visible: true,
+    direction: 'left'
   }
   tasks.push(task)
 }
 
 const options = {
+  title: '自定义甘特视图',
   taskMapping: {
     id: 'id',
     progress: 'percent',
@@ -105,9 +117,9 @@ const options = {
   },
   // 若 maxHeight 为 0 或者 undefined，则使用 maxRows , horizontalGap 和 rowHeight 计算最大高度
   maxHeight: 0,
-  maxRows: 12,
-  rowHeight: 36,
-  horizontalGap: 6,
+  maxRows: 18,
+  rowHeight: 30,
+  horizontalGap: 4,
   columns: [
     {
       id: 'uuid_task_name',
@@ -124,7 +136,7 @@ const options = {
       value: 'uuid_planned_start',
       display: true,
       width: 100,
-      fixed: 'left',
+      // fixed: 'left',
       customSlot: 'uuid_planned_start'
     },
     {
@@ -150,6 +162,12 @@ const options = {
       width: 100
     }
   ],
+  times: {
+    firstTime: new Date('2022-08-01').getTime(),
+    lastTime: new Date('2024-05-31').getTime(),
+    firstTaskTime: new Date('2023-03-01').getTime(),
+    lastTaskTime: new Date('2023-11-30').getTime()
+  },
   locale: {
     name: 'zh',
     Now: '当前时间',
