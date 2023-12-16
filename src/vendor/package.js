@@ -1,3 +1,2 @@
-// import Demo from '../../packages/components/demo'
-
-export default []
+import { XGanttElastic } from '../../packages'
+export default [XGanttElastic]

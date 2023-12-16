@@ -48,7 +48,6 @@
       @mousemove="emitEvent('mousemove', $event)"
       @mousedown="emitEvent('mousedown', $event)"
       @mouseup="emitEvent('mouseup', $event)"
-      @mousewheel="emitEvent('mousewheel', $event)"
       @touchstart="emitEvent('touchstart', $event)"
       @touchmove="emitEvent('touchmove', $event)"
       @touchend="emitEvent('touchend', $event)"
@@ -74,7 +73,8 @@
           ...root.style['chart-row-bar-polygon'],
           ...root.style['chart-row-task-polygon'],
           ...task.style['base'],
-          ...task.style['chart-row-bar-polygon']
+          ...task.style['chart-row-bar-polygon'],
+          ...fillColor
         }"
         :d="getPath"
       ></path>
@@ -99,12 +99,7 @@ export default {
   },
   inject: ['root'],
   mixins: [taskMixin],
-  props: {
-    task: {
-      type: Object,
-      default: () => {}
-    }
-  },
+  props: {},
   data() {
     return {}
   },

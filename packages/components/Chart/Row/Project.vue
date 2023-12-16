@@ -48,7 +48,6 @@
       @mousemove="emitEvent('mousemove', $event)"
       @mousedown="emitEvent('mousedown', $event)"
       @mouseup="emitEvent('mouseup', $event)"
-      @mousewheel="emitEvent('mousewheel', $event)"
       @touchstart="emitEvent('touchstart', $event)"
       @touchmove="emitEvent('touchmove', $event)"
       @touchend="emitEvent('touchend', $event)"
@@ -64,7 +63,8 @@
           ...root.style['chart-row-bar-polygon'],
           ...root.style['chart-row-project-polygon'],
           ...task.style['base'],
-          ...task.style['chart-row-bar-polygon']
+          ...task.style['chart-row-bar-polygon'],
+          ...fillColor
         }"
         :d="getPath"
       ></path>
@@ -88,12 +88,7 @@ export default {
   },
   inject: ['root'],
   mixins: [taskMixin],
-  props: {
-    task: {
-      type: Object,
-      default: () => {}
-    }
-  },
+  props: {},
   data() {
     return {}
   },
@@ -136,9 +131,9 @@ export default {
      */
     getPath() {
       const { width, height } = this.task
-      const halfHeight = height / 2
+      const halfHeight = height / 2 + 1
       // 两个尖角的宽高尺寸
-      const corner = height / 4
+      const corner = halfHeight / 2
       return `M ${0},${halfHeight - corner}
                 l ${width},0
                 l ${0},${halfHeight}

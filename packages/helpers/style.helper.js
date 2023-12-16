@@ -7,8 +7,7 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     },
     'main-container-wrapper': {
       overflow: 'hidden',
-      'border-top': '1px solid #eee',
-      'border-bottom': '1px solid #eee'
+      outline: '#eee solid 1px'
     },
     'main-container': {
       float: 'left',
@@ -73,16 +72,9 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       display: 'flex',
       'user-select': 'none',
       'vertical-align': 'middle',
-      'border-bottom': '1px solid #eee',
-      'border-left': '1px solid #eee'
+      'border-bottom': '1px solid #eee'
     },
-    'task-list-header-column': {
-      'border-left': '1px solid #00000050',
-      'box-sizing': 'border-box',
-      display: 'flex',
-      background: '#f3f5f7',
-      'border-color': 'transparent'
-    },
+    'task-list-header-column': {},
     'task-list-expander-wrapper': {
       display: 'inline-flex',
       'flex-shrink': '0',
@@ -130,8 +122,8 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       stroke: '#000000A0'
     },
     'task-list-container': {
-      'box-shadow': '#c6c6c6 0px 1px 5px',
-      'z-index': 1
+      // 'box-shadow': '#c6c6c6 0px 1px 5px',
+      // 'z-index': 1
     },
     'task-list-header-label': {
       overflow: 'hidden',
@@ -144,12 +136,12 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       'vertical-align': 'middle'
     },
     'task-list-header-resizer-wrapper': {
-      background: 'transparent',
-      height: '100%',
-      width: '6px',
-      cursor: 'col-resize',
-      display: 'inline-flex',
-      'vertical-align': 'center'
+      // background: 'transparent',
+      // height: '100%',
+      // width: '2px',
+      // cursor: 'col-resize',
+      // display: 'inline-flex',
+      // 'vertical-align': 'center'
     },
     'task-list-header-resizer': { margin: 'auto 0px' },
     'task-list-header-resizer-dot': {
@@ -173,7 +165,7 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     'task-list-item-column': {
       display: 'inline-flex',
       'flex-shrink': '0',
-      'border-left': '1px solid #00000050',
+      // 'border-left': '1px solid #00000050',
       'box-sizing': 'border-box',
       'border-color': '#eee'
     },
@@ -214,24 +206,32 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
       'stroke-width': 1
     },
     'grid-line-time': {
-      stroke: '#1b58e3',
+      stroke: '#f44336',
       'stroke-width': 1
     },
     chart: {
       'user-select': 'none',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      position: 'absolute',
+      right: 0,
+      left: 0,
+      bottom: 0,
+      top: 0,
+      width: '100%'
     },
     'chart-calendar-container': {
       'user-select': 'none',
       overflow: 'hidden',
       'max-width': '100%',
-      'border-right': '1px solid #eee'
+      // 'border-right': '1px solid #eee',
+      position: 'relative',
+      'z-index': 1
     },
     'chart-graph-container': {
       'user-select': 'none',
       overflow: 'hidden',
-      'max-width': '100%',
-      'border-right': '1px solid #eee'
+      'max-width': '100%'
+      // 'border-right': '1px solid #eee'
     },
     'chart-area': {},
     'chart-graph': {
@@ -265,15 +265,27 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     'chart-row-project-wrapper': {},
     'chart-row-project': {},
     'chart-row-project-polygon': {
-      stroke: '#b1c4d5',
-      fill: '#b1c4d5'
+      stroke: '#B0BACE',
+      fill: '#B0BACE'
+    },
+    'chart-row-group-wrapper': {},
+    'chart-row-group': {},
+    'chart-row-group-polygon': {
+      stroke: '#B0BACE',
+      fill: '#B0BACE'
     },
     'chart-row-milestone-wrapper': {},
     'chart-row-milestone': {},
-    'chart-row-milestone-polygon': {},
+    'chart-row-milestone-polygon': {
+      stroke: '#1F4399',
+      fill: '#1F4399'
+    },
     'chart-row-task-wrapper': {},
     'chart-row-task': {},
-    'chart-row-task-polygon': {},
+    'chart-row-task-polygon': {
+      stroke: '#3370FF',
+      fill: '#3370FF'
+    },
     'chart-row-progress-bar-wrapper': {},
     'chart-row-progress-bar': {},
     'chart-row-progress-bar-line': {

@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import _ from 'lodash'
 import getStyle from './style.helper.js'
+import { minDateTime, maxDateTime } from '@packages/utils/datetime.util.js'
 
 /**
  * Helper function to determine if specified variable is an object
@@ -332,81 +333,64 @@ export function makeTaskTree(task, tasks) {
   return task
 }
 
-export function ganttFormatGroup(tasks, conditions) {
-  const r = ganttGroupBy(tasks, conditions)
-  const f = _.flatMapDeep(r)
-  return f
-}
-const colConfigs = [
-  {
-    id: 'uuid_task_name',
-    label: '任务详情',
-    value: 'uuid_task_name',
-    display: true,
-    expander: true,
-    width: 100
-  },
-  {
-    id: 'uuid_planned_start',
-    label: '计划开始时间',
-    value: 'uuid_planned_start',
-    display: true,
-    width: 100,
-    customSlot: 'uuid_planned_start'
-  },
-  {
-    id: 'uuid_planned_end',
-    label: '计划结束时间',
-    value: 'uuid_planned_end',
-    display: true,
-    width: 100
-  },
-  {
-    id: 'uuid_actual_start',
-    label: '实际开始时间',
-    value: 'uuid_actual_start',
-    display: true,
-    width: 100
-  },
-  {
-    id: 'uuid_actual_end',
-    label: '实际结束时间',
-    value: 'uuid_actual_end',
-    display: true,
-    width: 100
-  }
-]
+export function ganttFormatGroup(taskList, conditionList, options) {
+  const taskMapping = options.taskMapping
+  const colConfigs = options.columns
+  const { label, plannedStart, plannedEnd } = taskMapping
 
-function ganttGroupBy(targetList, conditions, parentKey) {
-  if (!conditions || !conditions.length) return targetList
+  const ganttGroupBy = function (targetList, conditions, parentKey) {
+    if (!conditions || !conditions.length) return targetList
 
-  const cloneConditions = _.cloneDeep(conditions)
-  const condition = cloneConditions.shift()
+    const cloneConditions = _.cloneDeep(conditions)
+    const condition = cloneConditions.shift()
 
-  if (!condition) return targetList
-  if (!Array.isArray(targetList)) return targetList
+    if (!condition) return targetList
+    if (!Array.isArray(targetList)) return targetList
 
-  const groups = _.groupBy(targetList, condition)
-  const isRecursive = cloneConditions.length
-  const result = Object.entries(groups).map(([key, group]) => {
-    const fullKey = `${parentKey || ''}${key}`
-    const groupTree = isRecursive
-      ? ganttGroupBy(group, cloneConditions, fullKey)
-      : group.map((item) => {
-          return {
-            ...item,
-            parentId: (parentKey || '') + key
-          }
-        })
-    const found = colConfigs.find(i => i.id === condition)
-    groupTree.unshift({
-      // todo taskMapping
-      uuid_task_name: found.label + ':' + key,
-      // uuid_task_name: condition, // fullKey,
-      id: fullKey,
-      parentId: parentKey
+    const groups = _.groupBy(targetList, condition)
+    const isRecursive = cloneConditions.length
+    const result = Object.entries(groups).map(([key, group]) => {
+      const fullKey = `${parentKey || ''}${key}`
+      const groupTree = isRecursive
+        ? ganttGroupBy(group, cloneConditions, fullKey)
+        : group.map((item) => {
+            return {
+              ...item,
+              parentId: (parentKey || '') + key
+            }
+          })
+      // todo 待优化：加入配置
+      const found = colConfigs.find((i) => i.id === condition)
+      const flatGroup = _.flatMapDeep(groupTree)
+      const start = minDateTime(flatGroup.map((o) => o[plannedStart]))
+      const end = maxDateTime(flatGroup.map((o) => o[plannedEnd]))
+      groupTree.unshift({
+        [label]: found.label + ':' + key,
+        [plannedStart]: start,
+        [plannedEnd]: end,
+        id: fullKey,
+        parentId: parentKey,
+        type: 'group'
+      })
+      return groupTree
     })
-    return groupTree
+    return result
+  }
+
+  const r = ganttGroupBy(taskList, conditionList)
+  const f = _.flatMapDeep(r)
+  const parentsMap = new Map()
+  const childrenTasks = f.filter((o) => o.parentId)
+  childrenTasks.forEach((task) => {
+    const id = task.parentId
+    if (!parentsMap.has(id)) {
+      parentsMap.set(id, [task])
+    } else {
+      const springs = parentsMap.get(id)
+      springs.push(task)
+      parentsMap.set(id, springs)
+    }
   })
-  return result
+
+  return f
 }

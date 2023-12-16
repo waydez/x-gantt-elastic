@@ -31,14 +31,6 @@
         :x2="line.x2"
         :y2="line.y2"
       ></line>
-      <line
-        class="gantt-elastic__grid-line-time"
-        :style="{ ...root.style['grid-line-time'] }"
-        :x1="root.timeLinePosition.x"
-        :y1="root.timeLinePosition.y1"
-        :x2="root.timeLinePosition.x"
-        :y2="root.timeLinePosition.y2"
-      ></line>
     </g>
   </svg>
 </template>

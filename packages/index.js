@@ -1,7 +1,7 @@
-import { GanttEngine } from './engine/index'
-import { GanttElastic } from './components/index'
-import * as html2Image from 'html-to-image'
+// import * as html2Image from 'html-to-image'
 import htm2canvas from 'html2canvas'
+import { XGanttEngine } from './engine/index'
+import { XGanttElastic } from './components/index'
 
 // import Mixin from './mixin/demo.mixin.js'
 // locale
@@ -12,9 +12,13 @@ import htm2canvas from 'html2canvas'
 // import './vendor/element-ui'
 // import EventBus from './vendor/event-bus'
 
-GanttElastic.install = (Vue, opts) => Vue.component(GanttElastic.name, GanttElastic)
+XGanttElastic.install = (Vue, opts) => {
+  Vue.component(XGanttElastic.name, XGanttElastic)
+  // Vue.prototype.$html2Image = html2Image
+  Vue.prototype.$htm2canvas = htm2canvas
+}
 
-const components = [GanttElastic]
+const components = [XGanttElastic]
 
 const install = (Vue, opts) => {
   // check if installed
@@ -24,11 +28,11 @@ const install = (Vue, opts) => {
   components.forEach((item) => {
     Vue.component(item.name, item)
   })
-  Vue.prototype.$html2Image = html2Image
+  // Vue.prototype.$html2Image = html2Image
   Vue.prototype.$htm2canvas = htm2canvas
 }
 
-const GanttElasticPlugin = { install }
+const XGanttElasticPlugin = { install }
 
 // auto install
 let GlobalVue = null
@@ -38,9 +42,9 @@ if (typeof window !== 'undefined') {
   GlobalVue = global.Vue
 }
 if (GlobalVue) {
-  GlobalVue.use(GanttElasticPlugin)
+  GlobalVue.use(XGanttElasticPlugin)
 }
 
-export default GanttElasticPlugin
+export default XGanttElasticPlugin
 
-export { GanttEngine, GanttElastic }
+export { XGanttEngine, XGanttElastic }

@@ -1,5 +1,6 @@
 <template>
   <div
+    v-show="allChildren.length"
     :class="getClassPrefix() + '-wrapper'"
     :style="{ ...root.style[getClassPrefix(false) + '-wrapper'], ...style }"
   >

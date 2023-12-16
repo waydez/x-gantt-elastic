@@ -6,16 +6,13 @@
       height: `${root.state.options.calendar.height}px`,
       'margin-bottom': `${root.state.options.calendar.gap}px`
     }"
+    @mousemove="resizerMouseMove"
   >
     <div
-      v-for="column in root.getTaskListColumns"
+      v-for="column in taskColumns"
       :key="column._id"
       class="gantt-elastic__task-list-header-column"
-      :style="{
-        ...root.style['task-list-header-column'],
-        ...column.style['task-list-header-column'],
-        ...getStyle(column)
-      }"
+      :style="getStyle(column)"
     >
       <task-list-expander
         v-if="column.expander"
@@ -35,42 +32,9 @@
       </div>
       <div
         class="gantt-elastic__task-list-header-resizer-wrapper"
-        :style="{
-          ...root.style['task-list-header-resizer-wrapper'],
-          ...column.style['task-list-header-resizer-wrapper']
-        }"
         :column="column"
         @mousedown="resizerMouseDown($event, column)"
       >
-        <div
-          class="gantt-elastic__task-list-header-resizer"
-          :style="{
-            ...root.style['task-list-header-resizer'],
-            ...column.style['task-list-header-resizer']
-          }"
-        >
-          <div
-            class="gantt-elastic__task-list-header-resizer-dot"
-            :style="{
-              ...root.style['task-list-header-resizer-dot'],
-              ...column.style['task-list-header-resizer-dot']
-            }"
-          ></div>
-          <div
-            class="gantt-elastic__task-list-header-resizer-dot"
-            :style="{
-              ...root.style['task-list-header-resizer-dot'],
-              ...column.style['task-list-header-resizer-dot']
-            }"
-          ></div>
-          <div
-            class="gantt-elastic__task-list-header-resizer-dot"
-            :style="{
-              ...root.style['task-list-header-resizer-dot'],
-              ...column.style['task-list-header-resizer-dot']
-            }"
-          ></div>
-        </div>
       </div>
     </div>
   </div>
@@ -78,18 +42,25 @@
 
 <script>
 import TaskListExpander from '../Expander.vue'
+
 export default {
   name: 'TaskListHeader',
   components: {
     TaskListExpander
   },
-
   inject: ['root'],
-
+  props: {
+    taskColumns: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
       resizer: {
+        column: null,
         moving: false,
+        initialX: 0,
         x: 0
       }
     }
@@ -123,8 +94,8 @@ export default {
       'mousemove',
       this.resizerMouseMove.bind(this)
     )
-    this.root.$on('main-view-mousemove', this.resizerMouseMove)
-    this.root.$on('main-view-mouseup', this.resizerMouseUp)
+    // this.root.$on('main-view-mousemove', this.resizerMouseMove)
+    // this.root.$on('main-view-mouseup', this.resizerMouseUp)
   },
 
   methods: {
@@ -142,11 +113,19 @@ export default {
      * Resizer mouse down event handler
      */
     resizerMouseDown(event, column) {
+      event.preventDefault()
       if (!this.resizer.moving) {
-        this.resizer.moving = column
-        this.resizer.x = event.clientX
+        // 该列的配置信息
+        this.resizer.column = column
+        this.resizer.moving = true
+        this.resizer.initialX = event.clientX
         this.resizer.initialWidth = column.width
-        this.root.$emit('taskList-column-width-change-start', this.resizer.moving)
+        const offsetX = this.root.$el.getBoundingClientRect().left
+        this.resizer.x = event.x - offsetX
+        this.root.$emit('taskList-column-width-change-start', {
+          x: this.resizer.x,
+          moving: this.resizer.moving
+        })
       }
     },
 
@@ -154,15 +133,15 @@ export default {
      * Resizer mouse move event handler
      */
     resizerMouseMove(event) {
+      event.preventDefault()
       if (this.resizer.moving) {
-        const lastWidth = this.resizer.moving.width
-        this.resizer.moving.width = this.resizer.initialWidth + event.clientX - this.resizer.x
-        if (this.resizer.moving.width < this.root.state.options.taskList.minWidth) {
-          this.resizer.moving.width = this.root.state.options.taskList.minWidth
-        }
-        if (lastWidth !== this.resizer.moving.width) {
-          this.root.$emit('taskList-column-width-change', this.resizer.moving)
-        }
+        const offsetX = this.root.$el.getBoundingClientRect().left
+        this.resizer.x = event.x - offsetX
+
+        this.root.$emit('taskList-column-width-change', {
+          x: this.resizer.x,
+          moving: this.resizer.moving
+        })
       }
     },
 
@@ -170,11 +149,43 @@ export default {
      * Resizer mouse up event handler
      */
     resizerMouseUp(event) {
+      event.preventDefault()
       if (this.resizer.moving) {
-        this.root.$emit('taskList-column-width-change-stop', this.resizer.moving)
+        const column = this.resizer.column
+        column.width = this.resizer.initialWidth + event.clientX - this.resizer.initialX
+        if (column.width < this.root.state.options.taskList.minWidth) {
+          column.width = this.root.state.options.taskList.minWidth
+        }
         this.resizer.moving = false
+        this.root.$emit('taskList-column-width-change-stop', {
+          x: this.resizer.x,
+          moving: this.resizer.moving
+        })
       }
     }
   }
 }
 </script>
+
+<style lang="scss">
+.gantt-elastic__task-list-header-resizer-wrapper {
+  background: transparent;
+  height: 100%;
+  width: 2px;
+  cursor: col-resize;
+  display: inline-flex;
+  vertical-align: center;
+}
+
+.gantt-elastic__task-list-header-column {
+  box-sizing: border-box;
+  display: flex;
+  background: #f3f5f7;
+  border-left: 1px solid #eee;
+  color: #333;
+  font-weight: 600;
+  &:first-child:not(:last-child) {
+    border-left: none;
+  }
+}
+</style>

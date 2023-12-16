@@ -9,105 +9,92 @@ function getDate(hours) {
   const timeStamp = new Date(currentYear, currentMonth, currentDay, 0, 0, 0).getTime()
   return new Date(timeStamp + hours * 60 * 60 * 1000).getTime()
 }
-
-const tasks = [
-  {
-    id: 'uuid_001',
-    uuid_planned_start: '2023-11-11',
-    uuid_planned_end: '2023-11-19',
-    // uuid_actual_start: '2023-11-13',
-    // uuid_actual_end: '2023-11-21',
-    uuid_task_name: '任务为 1',
-    // duration: 15 * 24 * 60 * 60 * 1000,
-    percent: 85,
-    type: 'task'
-  },
-  {
-    id: 'uuid_002',
-    uuid_planned_start: '2023-03-01',
-    uuid_planned_end: '2023-05-01',
-    uuid_actual_start: '2023-05-05',
-    uuid_actual_end: '2023-09-01',
-    uuid_task_name: '任务为 2',
-    // duration: 15 * 24 * 60 * 60 * 1000,
-    percent: 85,
-    type: 'task'
-  },
-  {
-    id: 'uuid_003',
-    uuid_planned_start: '2023-11-11',
-    uuid_planned_end: '2023-11-19',
-    uuid_actual_start: '2023-11-13',
-    uuid_actual_end: '2023-11-21',
-    uuid_task_name: '任务为 3',
-    // duration: 15 * 24 * 60 * 60 * 1000,
-    percent: 85,
-    type: 'task'
-  },
-  {
-    id: 'uuid_004',
-    uuid_planned_start: '2023-11-27',
-    uuid_planned_end: '2023-11-28',
-    // uuid_actual_start: '2023-05-01',
-    // uuid_actual_end: '2023-09-01',
-    uuid_task_name: '任务为 4',
-    // duration: 15 * 24 * 60 * 60 * 1000,
-    // percent: 85,
-    type: 'milestone'
-    // type: 'task'
-  },
-  {
-    id: 'uuid_005',
-    uuid_planned_start: '2023-11-20',
-    uuid_planned_end: '2023-11-27',
-    uuid_actual_start: '2023-11-21',
-    uuid_actual_end: '2023-11-28',
-    uuid_task_name: '任务为 5',
-    // duration: 15 * 24 * 60 * 60 * 1000,
-    percent: 65,
-    type: 'task'
-  },
-  {
-    id: 'uuid_006',
-    // parentId: 'uuid_006',
-    // dependentOn: ['uuid_003', 'uuid_006'],
-    uuid_planned_start: '2023-11-22',
-    uuid_planned_end: '2023-11-29',
-    uuid_actual_start: '2023-11-23',
-    uuid_actual_end: '2023-11-30',
-    uuid_task_name: '任务为 6',
-    // duration: 15 * 24 * 60 * 60 * 1000,
-    percent: 35,
-    type: 'task'
-  },
-  {
-    id: 'uuid_007',
-    // parentId: 'uuid_007',
-    // dependentOn: ['uuid_001', 'uuid_006'],
-    uuid_planned_start: '2023-12-02 ',
-    uuid_planned_end: '2023-12-05 ',
-    uuid_actual_start: '2023-12-01',
-    uuid_actual_end: '2023-12-04',
-    uuid_task_name: '任务为 7',
-    // duration: 15 * 24 * 60 * 60 * 1000,
-    percent: 15,
-    type: 'task'
-  },
-  {
-    id: 'uuid_008',
-    uuid_planned_start: '2023-11-11',
-    uuid_planned_end: '2023-11-20',
-    uuid_actual_start: '2023-11-13',
-    uuid_actual_end: '2023-11-21',
-    uuid_task_name: '任务为 8',
-    // duration: 15 * 24 * 60 * 60 * 1000,
-    percent: 85,
-    type: 'task'
-  }
+const dataRange = [
+  '2023-11-11',
+  '2023-03-01',
+  '2023-05-01',
+  '2023-09-01',
+  '2023-11-19',
+  '2023-11-13',
+  '2023-11-21',
+  '2023-11-27',
+  '2023-11-28',
+  '2023-11-29',
+  '2023-11-30',
+  '2023-12-01',
+  '2023-12-02',
+  '2023-12-06',
+  '2023-12-12',
+  '2023-12-22',
+  '2023-12-30',
+  '2023-12-31',
+  '2024-01-01',
+  '2024-01-05',
+  '2024-01-08',
+  '2024-01-11',
+  '2024-01-15',
+  '2024-01-16',
+  '2024-01-27'
 ]
+const n = 200
+const tasks = []
+
+const randomDate = function () {
+  const range = dataRange.length - 1
+  const index = parseInt(Math.random() * range)
+  return dataRange[index]
+}
+
+const randomPrevious = (max) => {
+  // const arr = new Array(3).fill(0)
+  const set = new Set()
+  while (set.size < 2) {
+    const id = 'uuid_' + parseInt(Math.random() * (max - 1))
+    set.add(id)
+  }
+  return [...set]
+}
+
+for (let i = 0; i < n; i++) {
+  let start = randomDate()
+  let end = randomDate()
+  while (new Date(end).getTime() <= new Date(start).getTime()) {
+    start = randomDate()
+    end = randomDate()
+  }
+  let actualStart = ''
+  let actualEnd = ''
+  let dependentOn = []
+  const actual = Math.random() > 0.5
+  if (actual) {
+    actualStart = randomDate()
+    actualEnd = randomDate()
+    while (new Date(actualEnd).getTime() <= new Date(actualStart).getTime()) {
+      actualStart = randomDate()
+      actualEnd = randomDate()
+    }
+    dependentOn = (i > 10 && randomPrevious(i)) || []
+  }
+  let type = 'task'
+  const milestone = Math.random() > 0.9
+  if (milestone) type = 'milestone'
+
+  const task = {
+    id: 'uuid_' + i,
+    uuid_planned_start: start,
+    uuid_planned_end: end,
+    uuid_actual_start: actualStart,
+    uuid_actual_end: actualEnd,
+    uuid_task_name: '任务为 ' + i,
+    type,
+    dependentOn
+  }
+  tasks.push(task)
+}
 
 const options = {
   taskMapping: {
+    id: 'id',
     progress: 'percent',
     label: 'uuid_task_name',
     // todo
@@ -128,6 +115,7 @@ const options = {
       value: 'uuid_task_name',
       display: true,
       expander: true,
+      fixed: 'left',
       width: 100
     },
     {
@@ -136,16 +124,16 @@ const options = {
       value: 'uuid_planned_start',
       display: true,
       width: 100,
-      customSlot: 'uuid_planned_start',
-      fixed: 'left'
+      fixed: 'left',
+      customSlot: 'uuid_planned_start'
     },
     {
       id: 'uuid_planned_end',
       label: '计划结束时间',
       value: 'uuid_planned_end',
       display: true,
-      width: 100,
-      fixed: 'left'
+      fixed: 'right',
+      width: 100
     },
     {
       id: 'uuid_actual_start',

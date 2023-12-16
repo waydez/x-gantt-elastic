@@ -31,12 +31,16 @@ import {
   notEqualDeep,
   getOptions,
   prepareStyle,
-  ganttFormatGroup
+  ganttFormatGroup,
+  fillTasks,
+  mapTasks,
+  makeTaskTree,
+  toIntegrateOptions
 } from '@packages/helpers'
 import { TOGGLE_HANDLER } from '@packages/constant/index'
+import { XGanttEngine } from '@packages/engine/index.js'
 import MainView from './Layout/MainView.vue'
 import ToolBar from './Layout/ToolBar.vue'
-import { GanttEngine } from '@packages/engine/index.js'
 
 const ganttCanvas = document.createElement('canvas')
 const ctx = ganttCanvas.getContext('2d')
@@ -54,7 +58,7 @@ initVue()
  * Main vue component
  */
 export default {
-  name: 'GanttElastic',
+  name: 'XGanttElastic',
   components: { MainView, ToolBar },
   props: {
     tasks: {
@@ -113,7 +117,11 @@ export default {
       },
       TOGGLE_HANDLER,
       ganttEngine: null,
-      unwatchTaskListColumnsDisplay: null
+      unwatchTaskListColumnsDisplay: null,
+      headerColResizer: {
+        moving: false,
+        x: 0
+      }
     }
   },
   computed: {
@@ -212,7 +220,8 @@ export default {
     getTaskListAllColumns() {
       const leftFixedCols = this.getTaskListLeftFixedColumns
       const noFixedCols = this.getTaskListNoFixedColumns
-      return [...leftFixedCols, ...noFixedCols]
+      const rightFixedCols = this.getTaskListRightFixedColumns
+      return [...leftFixedCols, ...noFixedCols, ...rightFixedCols]
     },
     /**
      * Get columns and compute dimensions on the fly
@@ -266,16 +275,12 @@ export default {
     if (!this.ganttEngine) throw Error('Gantt engine is not defined')
     this.initializeEvents()
     this.setup()
-    this.state.unwatchTasks = this.$watch(
-      'tasks',
-      (tasks) => {
-        const notEqual = notEqualDeep(tasks, this.outputTasks)
-        if (notEqual) {
-          this.setup('tasks')
-        }
-      },
-      { deep: true }
-    )
+    this.state.unwatchTasks = this.$watch('tasks', (tasks) => {
+      const notEqual = notEqualDeep(tasks, this.outputTasks)
+      if (notEqual) {
+        this.setup('tasks')
+      }
+    })
     this.state.unwatchOptions = this.$watch(
       'options',
       (opts) => {
@@ -300,14 +305,12 @@ export default {
     this.state.unwatchOutputTasks = this.$watch(
       'outputTasks',
       (tasks) => {
-        // console.log('outputTasks changed')
-        // this.onTaskListColumnWidthChange()
         this.$emit(
           'tasks-changed',
           tasks.map((task) => task)
         )
-      },
-      { deep: true }
+      }
+      // { deep: true }
     )
     this.state.unwatchOutputOptions = this.$watch(
       'outputOptions',
@@ -423,172 +426,13 @@ export default {
     },
 
     /**
-     * Fill out empty task properties and make it reactive
-     *
-     * @param {array} tasks
-     */
-    fillTasks(tasks) {
-      for (let task of tasks) {
-        if (typeof task.plannedX === 'undefined') {
-          task.plannedX = 0
-        }
-        if (typeof task.actualX === 'undefined') {
-          task.actualX = 0
-        }
-        if (typeof task.plannedY === 'undefined') {
-          task.plannedY = 0
-        }
-        if (typeof task.actualY === 'undefined') {
-          task.actualY = 0
-        }
-        if (typeof task.plannedWidth === 'undefined') {
-          task.plannedWidth = 0
-        }
-        if (typeof task.actualWidth === 'undefined') {
-          task.plannedWidth = 0
-        }
-        if (typeof task.height === 'undefined') {
-          task.height = 0
-        }
-        if (typeof task.mouseOver === 'undefined') {
-          task.mouseOver = false
-        }
-        if (typeof task.collapsed === 'undefined') {
-          task.collapsed = false
-        }
-        if (typeof task.dependentOn === 'undefined') {
-          task.dependentOn = []
-        }
-        if (typeof task.parentId === 'undefined') {
-          task.parentId = null
-        }
-        if (typeof task.style === 'undefined') {
-          task.style = {}
-        }
-        if (typeof task.children === 'undefined') {
-          task.children = []
-        }
-        if (typeof task.allChildren === 'undefined') {
-          task.allChildren = []
-        }
-        if (typeof task.parents === 'undefined') {
-          task.parents = []
-        }
-        if (typeof task.parent === 'undefined') {
-          task.parent = null
-        }
-        // 计划
-        if (typeof task.plannedStartTime === 'undefined') {
-          task.plannedStartTime = dayjs(task.plannedStart).valueOf()
-        }
-        if (
-          typeof task.plannedEndTime === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'plannedEnd')
-        ) {
-          task.plannedEndTime = dayjs(task.plannedEnd).valueOf()
-        } else if (
-          typeof task.plannedEnd === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'plannedDuration')
-        ) {
-          task.plannedEndTime = task.plannedStartTime + task.plannedDuration
-        }
-        if (
-          typeof task.plannedDuration === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'plannedEndTime')
-        ) {
-          task.plannedDuration = task.plannedEndTime - task.plannedStartTime
-        }
-        // 实际
-        if (typeof task.actualStartTime === 'undefined') {
-          task.actualStartTime = task.actualStart && dayjs(task.actualStart).valueOf()
-        }
-        if (
-          typeof task.actualEndTime === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'actualEnd')
-        ) {
-          task.actualEndTime = task.actualEnd && dayjs(task.actualEnd).valueOf()
-        } else if (
-          typeof task.actualEnd === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'actualDuration')
-        ) {
-          task.actualEndTime = task.actualStartTime + task.actualDuration
-        }
-        if (
-          typeof task.actualDuration === 'undefined' &&
-          Object.prototype.hasOwnProperty.call(task, 'actualEndTime')
-        ) {
-          task.actualDuration = task.actualEndTime - task.actualStartTime
-        }
-      }
-      return tasks
-    },
-
-    /**
-     * Map tasks
-     *
-     * @param {Array} tasks
-     * @param {Object} options
-     */
-    mapTasks(tasks, options) {
-      for (let [index, task] of tasks.entries()) {
-        // todo
-        tasks[index] = {
-          ...task,
-          id: task[options.taskMapping.id],
-          label: task[options.taskMapping.label],
-          // start: task[options.taskMapping.start],
-          plannedStart: task[options.taskMapping.plannedStart],
-          plannedEnd: task[options.taskMapping.plannedEnd],
-          actualStart: task[options.taskMapping.actualStart],
-          actualEnd: task[options.taskMapping.actualEnd],
-          // plannedDuration:
-          //   new Date(task[options.taskMapping.plannedEnd]).getTime() -
-          //   new Date(task[options.taskMapping.plannedStart]).getTime(),
-          progress: task[options.taskMapping.progress],
-          type: task[options.taskMapping.type],
-          style: task[options.taskMapping.style],
-          collapsed: task[options.taskMapping.collapsed]
-        }
-      }
-      return tasks
-    },
-
-    /**
-     * 识别外部 options 配置，进行整合
-     */
-    handleFormatOptions(opts) {
-      const config = { taskList: {}, row: {}, chart: { grid: { horizontal: {} } } }
-      config.locale = opts.locale
-      config.taskMapping = opts.taskMapping
-      if (typeof opts.maxHeight === 'number') {
-        config.maxRows = opts.maxRows
-      } else console.warn('The type of maxRows is not number')
-
-      if (typeof opts.rowHeight === 'number') {
-        config.row.height = opts.rowHeight
-      } else console.warn('The type of rowHeight is not number')
-
-      if (typeof opts.horizontalGap === 'number') {
-        config.chart.grid.horizontal.gap = opts.horizontalGap
-      } else console.warn('The type of horizontalGap is not number')
-
-      const maxHeight = opts.maxHeight || opts.maxRows * (opts.rowHeight + opts.horizontalGap * 2)
-      if (typeof maxHeight === 'number') {
-        config.maxHeight = maxHeight
-      }
-
-      config.taskList.columns = opts.columns
-      return config
-    },
-
-    /**
      * Initialize component
      */
     initialize(itsUpdate = '') {
       // style
       if (Object.keys(this.state.dynamicStyle).length === 0) this.initializeStyle()
       // options
-      const selfConfigOptions = this.handleFormatOptions(this.options)
+      const selfConfigOptions = toIntegrateOptions(this.options)
       let options = mergeDeep(
         {},
         this.state.options,
@@ -615,10 +459,10 @@ export default {
       })
       this.state.options = options
       // tasks
-      let tasks = this.mapTasks(this.tasks, options)
-      tasks = this.fillTasks(tasks)
+      let tasks = mapTasks(this.tasks, options)
+      tasks = fillTasks(tasks)
       this.state.tasksById = this.resetTaskTree(tasks)
-      this.state.taskTree = this.makeTaskTree(this.state.rootTask, tasks)
+      this.state.taskTree = makeTaskTree(this.state.rootTask, tasks)
       this.state.tasks = this.state.taskTree.allChildren.map((childId) => this.getTask(childId))
       this.calculateTaskListColumnsDimensions()
       this.state.options.scrollBarHeight = this.getScrollBarHeight()
@@ -674,18 +518,17 @@ export default {
      * Synchronize scrollTop property when row height is changed
      */
     syncScrollTop() {
-      if (
+      const { scrollTop } = this.state.refs.chartGraph
+      const domsOfSync =
         this.state.refs.taskListItems &&
-        this.state.refs.taskListItems.every(
-          (item) => item.scrollTop !== this.state.refs.chartGraph.scrollTop
-        )
-      ) {
+        this.state.refs.taskListItems.filter((item) => item.scrollTop !== scrollTop)
+      if (domsOfSync && domsOfSync.length) {
         this.state.options.scroll.top = this.state.refs.chartScrollContainerVertical.scrollTop =
-          this.state.refs.chartGraph.scrollTop
-
-        this.state.refs.taskListItems.forEach((item) => {
-          item.scrollTop = this.state.refs.chartGraph.scrollTop
-        })
+          scrollTop
+        // dom.scrollTop = scrollTop
+        // dom.scrollTo(0, scrollTop)
+        // domsOfSync.forEach((dom) => dom.scrollTo(0, scrollTop))
+        domsOfSync.forEach((dom) => (dom.scrollTop = scrollTop))
       }
     },
 
@@ -736,35 +579,6 @@ export default {
         tasksById[current.id] = current
       }
       return tasksById
-    },
-
-    /**
-     * Make task tree, after reset - look above
-     *
-     * @param {object} task
-     * @returns {object} tasks with children and parents
-     */
-    makeTaskTree(task, tasks) {
-      for (let i = 0, len = tasks.length; i < len; i++) {
-        let current = tasks[i]
-        if (current.parentId === task.id) {
-          if (task.parents.length) {
-            task.parents.forEach((parent) => current.parents.push(parent))
-          }
-          if (!Object.prototype.propertyIsEnumerable.call(task, '__root')) {
-            current.parents.push(task.id)
-            current.parent = task.id
-          } else {
-            current.parents = []
-            current.parent = null
-          }
-          current = this.makeTaskTree(current, tasks)
-          task.allChildren.push(current.id)
-          task.children.push(current.id)
-          current.allChildren.forEach((childId) => task.allChildren.push(childId))
-        }
-      }
-      return task
     },
 
     /**
@@ -933,6 +747,17 @@ export default {
     },
 
     /**
+     * Task list container scroll event handler
+     */
+    onScrollTaskListContainer(ev) {
+      const scrollLeft = ev.target.scrollLeft
+      if (scrollLeft !== this.state.options.taskList.scrollLeft) {
+        this.state.options.taskList.scrollLeft = scrollLeft
+        this.state.refs.taskListContainer.scrollLeft = scrollLeft
+      }
+    },
+
+    /**
      * 刷新滚动
      */
     refreshScrollChart() {
@@ -1005,7 +830,13 @@ export default {
       if (top !== null) {
         this.state.refs.chartScrollContainerVertical.scrollTop = top
         this.state.refs.chartGraph.scrollTop = top
-        this.state.refs.taskListItems.scrollTop = top
+        const domsOfSync =
+          this.state.refs.taskListItems &&
+          this.state.refs.taskListItems.filter((item) => item.scrollTop !== top)
+        if (domsOfSync && domsOfSync.length) {
+          domsOfSync.forEach((dom) => (dom.scrollTop = top))
+        }
+
         this.state.options.scroll.top = top
         this.syncScrollTop()
       }
@@ -1104,16 +935,35 @@ export default {
     },
 
     onTaskListViewWidthChange(value) {
-      this.state.options.taskList.viewWidth = value
+      const state = this.state
+      if (value > state.options.taskList.finalWidth) {
+        state.options.taskList.viewWidth = state.options.taskList.finalWidth
+        return
+      }
+      state.options.taskList.viewWidth = value
     },
-
+    /**
+     * Task list column width change start event handler
+     */
+    onTaskListColumnWidthChangeStart({ x, moving }) {
+      this.headerColResizer.moving = moving
+      this.headerColResizer.x = x
+    },
     /**
      * Task list column width change event handler
      */
-    onTaskListColumnWidthChange() {
-      // console.log('taskList-column-width-change')
+    onTaskListColumnWidthChange({ x, moving }) {
+      this.headerColResizer.moving = moving
+      this.headerColResizer.x = x
+    },
+    /**
+     * Task list column width change stop event handler
+     */
+    onTaskListColumnWidthChangeStop({ x, moving }) {
+      this.headerColResizer.moving = moving
+      this.headerColResizer.x = x
       this.calculateTaskListColumnsDimensions()
-      this.fixScrollPos()
+      // this.fixScrollPos()
     },
 
     /**
@@ -1166,7 +1016,7 @@ export default {
      * init gantt engine
      */
     initEngine() {
-      this.ganttEngine = new GanttEngine()
+      this.ganttEngine = new XGanttEngine()
       return this.ganttEngine
     },
 
@@ -1183,12 +1033,15 @@ export default {
         { name: 'scope-change', evt: this.onScopeChange },
         { name: 'taskList-width-change', evt: this.onTaskListWidthChange },
         { name: 'taskList-view-width-change', evt: this.onTaskListViewWidthChange },
+        { name: 'taskList-column-width-change-start', evt: this.onTaskListColumnWidthChangeStart },
         { name: 'taskList-column-width-change', evt: this.onTaskListColumnWidthChange },
+        { name: 'taskList-column-width-change-stop', evt: this.onTaskListColumnWidthChangeStop },
         { name: 'taskList-display-toggle', evt: this.onTaskListDisplayToggle },
         { name: 'chart-position-recenter', evt: this.onChartPositionRecenter },
         { name: 'chart-download-with-pic', evt: this.onChartDownloadWithPic },
         { name: 'taskList-row-click', evt: this.onTaskListRowClick },
-        { name: 'chartBlock-row-click', evt: this.onChartBlockRowClick }
+        { name: 'chartBlock-row-click', evt: this.onChartBlockRowClick },
+        { name: 'taskList-container-scroll-horizontal', evt: this.onScrollTaskListContainer }
       ]
       eventConfig.forEach((event) => this.$on(event.name, event.evt))
     },
@@ -1534,9 +1387,9 @@ export default {
     /**
      * 根据条件分组
      */
-    handleFilterGroup(conditions, tasks) {
+    handleFilterGroup(tasks, conditions, options) {
       if (!conditions) return
-      const newTasks = ganttFormatGroup(tasks, conditions)
+      const newTasks = ganttFormatGroup(tasks, conditions, options)
       return newTasks
     }
   }
@@ -1566,15 +1419,24 @@ foreignObject > * {
 .gantt-elastic__main-view-container {
   overflow: hidden;
   max-width: 100%;
+  width: 100%;
 }
 .gantt-elastic__main-view-container {
   position: relative;
 }
-.gantt-elastic__task-list-header-column:last-of-type {
+/* .gantt-elastic__task-list-header-column:last-of-type {
   border-right: 1px solid #00000050;
 }
 .gantt-elastic__task-list-item:last-of-type {
   border-bottom: 1px solid #00000050;
+} */
+/* 兼容虚拟滚动 dom 层级 */
+div:has(> .gantt-elastic__task-list-header-column):last-of-type {
+  border-right: 1px solid #00000050;
+}
+div:has(> .gantt-elastic__task-list-item):last-of-type {
+  /* 不能加，会导致虚拟滚动计算有问题 */
+  /* border-bottom: 1px solid #00000050; */
 }
 .gantt-elastic__task-list-item-value-wrapper:hover {
   overflow: visible !important;
@@ -1586,5 +1448,9 @@ foreignObject > * {
 }
 .gantt-elastic__task-list-item-value-wrapper:hover > .gantt-elastic__task-list-item-value {
   position: absolute;
+}
+.gantt-elastic__task-list .gantt-elastic__task-list-items > .virtual-list__client {
+  /* 避免任务列自行滚动，需要跟甘特图保持同步滚动 */
+  overflow: hidden !important;
 }
 </style>
