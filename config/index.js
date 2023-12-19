@@ -15,7 +15,9 @@ module.exports = {
     'pinyin-pro': true,
     mitt: true,
     dayjs: true,
-    'resize-observer-polyfill': true
+    'resize-observer-polyfill': true,
+    'throttle-debounce': true,
+    html2canvas: true
   },
   prefix: '@x-gantt-elastic'
 }
