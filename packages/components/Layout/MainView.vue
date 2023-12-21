@@ -22,11 +22,11 @@
           <task-list-container ref="taskListContainer" :task-columns="root.getTaskListAllColumns">
             <template
               v-for="column in root.getTaskListAllColumns"
-              v-slot:[column.customSlot]="scopeSlot"
+              v-slot:[column.id]="scopeSlot"
             >
               <slot
                 v-if="column.customSlot"
-                :name="column.customSlot"
+                :name="column.id"
                 :row="scopeSlot.row"
                 :column="scopeSlot.column"
               />
@@ -41,11 +41,11 @@
           >
             <template
               v-for="column in root.getTaskListLeftFixedColumns"
-              v-slot:[column.customSlot]="scopeSlot"
+              v-slot:[column.id]="scopeSlot"
             >
               <slot
                 v-if="column.customSlot"
-                :name="column.customSlot"
+                :name="column.id"
                 :row="scopeSlot.row"
                 :column="scopeSlot.column"
               />
@@ -60,11 +60,11 @@
           >
             <template
               v-for="column in root.getTaskListRightFixedColumns"
-              v-slot:[column.customSlot]="scopeSlot"
+              v-slot:[column.id]="scopeSlot"
             >
               <slot
                 v-if="column.customSlot"
-                :name="column.customSlot"
+                :name="column.id"
                 :row="scopeSlot.row"
                 :column="scopeSlot.column"
               />

@@ -11,7 +11,7 @@
             <span class="group-value__value">{{ value }}</span>
           </template>
         </div>
-        <slot v-else-if="column.customSlot" :name="column.customSlot" />
+        <slot v-else-if="column.customSlot" :name="column.id" />
         <div
           v-else
           class="gantt-elastic__task-list-item-value"
@@ -124,6 +124,13 @@ export default {
 }
 </script>
 <style lang="scss">
+.gantt-elastic__task-list-item-value-wrapper,
+.gantt-elastic__task-list-item-value-container {
+  width: 100%;
+}
+.gantt-elastic__task-list-item-value-container {
+  display: flex;
+}
 .gantt-elastic__task-list-item-group-value {
   padding: 4px;
   font-size: 12px;

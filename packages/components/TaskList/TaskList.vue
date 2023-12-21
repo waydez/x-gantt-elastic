@@ -33,10 +33,10 @@
               @click.native="taskRowClick($event, itemData)"
             >
               <template v-for="column in taskColumns">
-                <template :slot="column.customSlot">
+                <template :slot="column.id">
                   <slot
                     v-if="column.customSlot"
-                    :name="column.customSlot"
+                    :name="column.id"
                     :row="itemData"
                     :column="column"
                   />

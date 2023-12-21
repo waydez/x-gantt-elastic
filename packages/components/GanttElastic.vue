@@ -8,7 +8,7 @@
       <tool-bar></tool-bar>
     </template>
     <main-view ref="mainView">
-      <template v-for="column in getTaskListColumnsSilently" v-slot:[column.customSlot]="scopeSlot">
+      <template v-for="column in getTaskListColumnsSilently" v-slot:[column.id]="scopeSlot">
         <slot
           v-if="column.customSlot"
           :name="column.customSlot"

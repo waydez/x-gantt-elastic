@@ -6,10 +6,10 @@
     :style="calcFixedStyle"
   >
     <task-list :task-columns="taskColumns">
-      <template v-for="column in taskColumns" v-slot:[column.customSlot]="scopeSlot">
+      <template v-for="column in taskColumns" v-slot:[column.id]="scopeSlot">
         <slot
           v-if="column.customSlot"
-          :name="column.customSlot"
+          :name="column.id"
           :row="scopeSlot.row"
           :column="scopeSlot.column"
         />

@@ -7,8 +7,8 @@
         :options="root.state.options.taskList.expander"
         type="taskList"
       ></task-list-expander>
-      <template :slot="column.customSlot">
-        <slot v-if="column.customSlot" :name="column.customSlot" />
+      <template :slot="column.id">
+        <slot v-if="column.customSlot" :name="column.id" />
       </template>
     </item-column>
   </div>
