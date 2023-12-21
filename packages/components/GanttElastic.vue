@@ -548,8 +548,9 @@ export default {
           column.widthFromPercentage = (column.width / 100) * percent
         }
         percentage += column.widthFromPercentage
-        column.finalWidth = (column.thresholdPercent * column.widthFromPercentage) / 100
-        final += column.finalWidth
+        // column.finalWidth = (column.thresholdPercent * column.widthFromPercentage) / 100
+        // 允许根据用户配置设置宽度
+        final += column.width
         column.height = this.getTaskHeight() - this.style['grid-line-horizontal']['stroke-width']
       }
       this.state.options.taskList.widthFromPercentage = percentage

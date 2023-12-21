@@ -124,6 +124,7 @@ async function buildEntry(config) {
   const inputOptions = {
     input,
     // external: externalMap,
+    // 会将所有开头为 externalMap 的 key 的依赖全部加入忽略
     external: createExternal(externalMap, _external),
     plugins: createPlugins(config)
   }
@@ -135,7 +136,7 @@ async function buildEntry(config) {
     name: moduleName,
     paths: _paths,
     // Disable warning for default imports
-    exports: 'named' 
+    exports: 'named'
   }
   // to continue rollup after error occurred, use try-catch
   const bundle = await rollup.rollup(inputOptions)

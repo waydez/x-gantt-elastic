@@ -54,7 +54,8 @@ export default {
      */
     calcFixedWidth() {
       return this.taskColumns.reduce((total, item) => {
-        return total + item.finalWidth
+        // return total + item.finalWidth
+        return total + item.width
       }, 0)
     },
 

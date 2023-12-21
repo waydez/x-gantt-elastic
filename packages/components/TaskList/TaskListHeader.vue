@@ -106,7 +106,8 @@ export default {
      */
     getStyle(column) {
       return {
-        width: column.finalWidth + 'px'
+        // width: column.finalWidth + 'px'
+        width: column.width + 'px'
       }
     },
     /**

@@ -498,7 +498,8 @@ export default {
       e.preventDefault()
       if (!this.resizing) return
       this.resizing = false
-      this.root.$emit('taskList-view-width-change', Number(e.x))
+      const offsetX = this.$parent.$el.getBoundingClientRect().left
+      this.root.$emit('taskList-view-width-change', Number(e.x - offsetX))
     }
   }
 }

@@ -68,7 +68,8 @@ export default {
       return {
         ...this.root.style['task-list-item-column'],
         ...this.column.style['task-list-item-column'],
-        width: this.column.finalWidth + 'px',
+        // width: this.column.finalWidth + 'px',
+        width: this.column.width + 'px',
         height: this.column.height + 'px'
       }
     },
