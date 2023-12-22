@@ -128,14 +128,14 @@ const options = {
       display: true,
       expander: true,
       fixed: 'left',
-      width: 100
+      width: 200
     },
     {
       id: 'uuid_planned_start',
       label: '计划开始时间',
       value: 'uuid_planned_start',
       display: true,
-      width: 100,
+      width: 200,
       // fixed: 'left',
       customSlot: 'uuid_planned_start'
     },
@@ -145,21 +145,21 @@ const options = {
       value: 'uuid_planned_end',
       display: true,
       fixed: 'right',
-      width: 100
+      width: 200
     },
     {
       id: 'uuid_actual_start',
       label: '实际开始时间',
       value: 'uuid_actual_start',
       display: true,
-      width: 100
+      width: 200
     },
     {
       id: 'uuid_actual_end',
       label: '实际结束时间',
       value: 'uuid_actual_end',
       display: true,
-      width: 100
+      width: 200
     }
   ],
   times: {

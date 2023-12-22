@@ -315,8 +315,6 @@ export default function getStyle(fontSize = '12px', fontFamily = 'Arial, sans-se
     },
     'chart-scroll-container': {},
     'chart-scroll-container--horizontal': {
-      overflow: 'auto',
-      'max-width': '100%'
       // 'margin-top': '-16px',
       // position: 'relative',
       // 'z-index': 10

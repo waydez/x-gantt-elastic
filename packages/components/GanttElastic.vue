@@ -421,7 +421,7 @@ export default {
       var withScroll = inner.offsetHeight
       outer.parentNode.removeChild(outer)
       const height = noScroll - withScroll
-      this.style['chart-scroll-container--vertical']['margin-left'] = `-${height}px`
+      // this.style['chart-scroll-container--vertical']['margin-left'] = `-${height}px`
       return (this.state.options.scrollBarHeight = height)
     },
 
@@ -766,6 +766,7 @@ export default {
       const taskListScrollTo = (left) => {
         this.state.options.taskList.scrollLeft = left
         this.state.refs.taskListContainer.scrollLeft = left
+        this.state.refs.taskScrollContainer.scrollLeft = left
       }
       if (!ev.shiftKey && ev.deltaX === 0) {
         return

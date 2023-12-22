@@ -384,7 +384,7 @@ export default {
       this.ganttEngine.initTasksConfig()
       const height = getScrollBarHeight()
       this.options.scrollBarHeight = height
-      this.style['chart-scroll-container--vertical']['margin-left'] = `-${height}px`
+      // this.style['chart-scroll-container--vertical']['margin-left'] = `-${height}px`
       this.options.outerHeight = this.options.height + this.options.scrollBarHeight
     },
 
