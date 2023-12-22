@@ -759,6 +759,40 @@ export default {
     },
 
     /**
+     * Task list container wheel event handler
+     */
+    onWheelTaskList(ev) {
+      const taskScrollContainer = this.state.refs.taskScrollContainer
+      const taskListScrollTo = (left) => {
+        this.state.options.taskList.scrollLeft = left
+        this.state.refs.taskListContainer.scrollLeft = left
+      }
+      if (!ev.shiftKey && ev.deltaX === 0) {
+        return
+      } else if (ev.shiftKey && ev.deltaX === 0) {
+        let left = this.state.options.taskList.scrollLeft + ev.deltaY
+        const chartClientWidth = taskScrollContainer.clientWidth
+        const scrollWidth = taskScrollContainer.scrollWidth - chartClientWidth
+        if (left < 0) {
+          left = 0
+        } else if (left > scrollWidth) {
+          left = scrollWidth
+        }
+        taskListScrollTo(left)
+      } else {
+        let left = this.state.options.taskList.scrollLeft + ev.deltaX
+        const chartClientWidth = taskScrollContainer.clientWidth
+        const scrollWidth = taskScrollContainer.scrollWidth - chartClientWidth
+        if (left < 0) {
+          left = 0
+        } else if (left > scrollWidth) {
+          left = scrollWidth
+        }
+        taskListScrollTo(left)
+      }
+    },
+
+    /**
      * 刷新滚动
      */
     refreshScrollChart() {
@@ -1042,7 +1076,8 @@ export default {
         { name: 'chart-download-with-pic', evt: this.onChartDownloadWithPic },
         { name: 'taskList-row-click', evt: this.onTaskListRowClick },
         { name: 'chartBlock-row-click', evt: this.onChartBlockRowClick },
-        { name: 'taskList-container-scroll-horizontal', evt: this.onScrollTaskListContainer }
+        { name: 'taskList-container-scroll-horizontal', evt: this.onScrollTaskListContainer },
+        { name: 'taskList-container-wheel', evt: this.onWheelTaskList }
       ]
       eventConfig.forEach((event) => this.$on(event.name, event.evt))
     },

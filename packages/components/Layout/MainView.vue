@@ -18,6 +18,7 @@
           :class="`scrolling-${scrollPosition}`"
           @mousemove="resizerMove"
           @mouseup="resizerEnd"
+          @wheel.prevent="taskListWheel"
         >
           <task-list-container ref="taskListContainer" :task-columns="root.getTaskListAllColumns">
             <template
@@ -318,6 +319,7 @@ export default {
     this.root.state.refs.taskListContainer = this.$refs.taskListContainer.$el
     this.root.state.refs.chartScrollContainerHorizontal = this.$refs.chartScrollContainerHorizontal
     this.root.state.refs.chartScrollContainerVertical = this.$refs.chartScrollContainerVertical
+    this.root.state.refs.taskScrollContainer = this.scrollContainer
     document.addEventListener('mouseup', this.chartMouseUp.bind(this))
     document.addEventListener('mousemove', this.chartMouseMove.bind(this))
     // document.addEventListener('touchmove', this.chartMouseMove.bind(this))
@@ -350,6 +352,15 @@ export default {
      */
     onTaskListHorizontalScroll(ev) {
       this.root.$emit('taskList-container-scroll-horizontal', ev)
+
+      this.syncPosition()
+    },
+
+    /**
+     * Task list horizontal wheel event handler
+     */
+    taskListWheel(ev) {
+      this.root.$emit('taskList-container-wheel', ev)
 
       this.syncPosition()
     },
