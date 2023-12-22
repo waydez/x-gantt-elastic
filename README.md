@@ -231,6 +231,7 @@ Vue.use(XGanttElasticPlugin)
 - taskList-column-width-change-start
 - taskList-column-width-change
 - taskList-column-width-change-stop
+- taskList-container-wheel
 
 **时间日期相关**
 
